@@ -1,4 +1,4 @@
-// Donguri
+// Donguri ver.0.2
 //  1st res top 
 //   <> !extend:(ID):(SLIP):1000:512:donguri=(x/y) <br>
 //  1st res bottom
@@ -7,45 +7,59 @@
 //  https://donguri.wikiru.jp/?command
 /// Res top
 //// Donguri cannon
-<rx>> !extend:.+:.+:1000:512:donguri=\d/1 <br>	$&, 強制レベル表示/大砲可<hr>	msg
-<rx>> !extend:.+:.+:1000:512:donguri=\d/2 <br>	$&, 任意レベル表示/大砲可<hr>	msg
-<rx>> !extend:.+:.+:1000:512:donguri=\d/3 <br>	$&, 強制レベル表示/大砲不可<hr>	msg
-<rx>> !extend:.+:.+:1000:512:donguri=\d/4 <br>	$&, 任意レベル表示/大砲不可<hr>	msg
+<rx>> !extend:.*:.*:1000:512: <br>	$&, レベル表示/大砲は板のデフォルト<hr>	msg
+<rx>> !extend:.*:.*:1000:512:donguri=\d/1 <br>	$&, 強制レベル表示/大砲可<hr>	msg
+<rx>> !extend:.*:.*:1000:512:donguri=\d/2 <br>	$&, 任意レベル表示/大砲可<hr>	msg
+<rx>> !extend:.*:.*:1000:512:donguri=\d/3 <br>	$&, 強制レベル表示/大砲不可<hr>	msg
+<rx>> !extend:.*:.*:1000:512:donguri=\d/4 <br>	$&, 任意レベル表示/大砲不可<hr>	msg
 //// Donguri level
-<rx>> !extend:.+:.+:1000:512:donguri=(\d)/\d <br>	$&, 必要どんぐりレベル:$1	msg
+<rx>> !extend:.*:.*:1000:512:donguri=(\d)/\d <br>	$&, 必要どんぐりレベル:$1	msg
 //// SLIP
-<rx>> !extend:.+:default:1000:512:donguri=\d/\d <br>	$&, 板のデフォルトSLIP(ID末尾なし)	msg
-<rx>> !extend:.+:none:1000:512:donguri=\d/\d <br>	$&, SLIPなし(ID末尾なし)	msg
-<rx>> !extend:.+:checked:1000:512:donguri=\d/\d <br>	$&, SLIPなし(簡易ID末尾)	msg
-<rx>> !extend:.+:feature:1000:512:donguri=\d/\d <br>	$&, SLIPなし(基本ID末尾)	msg
-<rx>> !extend:.+:verbose:1000:512:donguri=\d/\d <br>	$&, SLIPなし(詳細ID末尾)	msg
-<rx>> !extend:.+:vvv:1000:512:donguri=\d/\d <br>	$&, 回線種別のみ(詳細ID末尾)	msg
-<rx>> !extend:.+:vvvv:1000:512:donguri=\d/\d <br>	$&, 回線種別+IP addr.(詳細ID末尾)	msg
-<rx>> !extend:.+:vvvvv:1000:512:donguri=\d/\d <br>	$&, 回線種別+SLIP(詳細ID末尾)	msg
-<rx>> !extend:.+:vvvvvv:1000:512:donguri=\d/\d <br>	$&, 回線種別+SLIP+IP addr.(詳細ID末尾)	msg
+<rx>> !extend:.*::1000:512:donguri=\d/\d <br>	$&, 板のデフォルトSLIP(ID末尾なし)	msg
+<rx>> !extend:.*:default:1000:512:donguri=\d/\d <br>	$&, 板のデフォルトSLIP(ID末尾なし)	msg
+<rx>> !extend:.*:none:1000:512:donguri=\d/\d <br>	$&, SLIPなし(ID末尾なし)	msg
+<rx>> !extend:.*:checked:1000:512:donguri=\d/\d <br>	$&, SLIPなし(簡易ID末尾)	msg
+<rx>> !extend:.*:feature:1000:512:donguri=\d/\d <br>	$&, SLIPなし(基本ID末尾)	msg
+<rx>> !extend:.*:verbose:1000:512:donguri=\d/\d <br>	$&, SLIPなし(詳細ID末尾)	msg
+<rx>> !extend:.*:vvv:1000:512:donguri=\d/\d <br>	$&, 回線種別のみ(詳細ID末尾)	msg
+<rx>> !extend:.*:vvvv:1000:512:donguri=\d/\d <br>	$&, 回線種別+IP addr.(詳細ID末尾)	msg
+<rx>> !extend:.*:vvvvv:1000:512:donguri=\d/\d <br>	$&, 回線種別+SLIP(詳細ID末尾)	msg
+<rx>> !extend:.*:vvvvvv:1000:512:donguri=\d/\d <br>	$&, 回線種別+SLIP+IP addr.(詳細ID末尾)	msg
 //// ID
-<rx>> !extend:default:.+:1000:512:donguri=\d/\d <br>	$&<hr>板のデフォルトID表示	msg
-<rx>> !extend:none:.+:1000:512:donguri=\d/\d <br>	$&<hr>IDなし	msg
-<rx>> !extend:checked:.+:1000:512:donguri=\d/\d <br>	$&<hr>強制ID	msg
+<rx>> !extend::.*:1000:512:donguri=\d/\d <br>	$&<hr>板のデフォルトID表示	msg
+<rx>> !extend:default:.*:1000:512:donguri=\d/\d <br>	$&<hr>板のデフォルトID表示	msg
+<rx>> !extend:none:.*:1000:512:donguri=\d/\d <br>	$&<hr>IDなし	msg
+<rx>> !extend:checked:.*:1000:512:donguri=\d/\d <br>	$&<hr>強制ID	msg
 /// VIPQ2_EXTDAT
 //// Donguri cannon
-<rx>(<hr>VIPQ2_EXTDAT:.+:.+:1000:512:donguri=\d/1: EXT was configured )	$&, 強制レベル表示/大砲可<hr>	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:.+:1000:512:donguri=\d/2: EXT was configured )	$&, 任意レベル表示/大砲可<hr>	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:.+:1000:512:donguri=\d/3: EXT was configured )	$&, 強制レベル表示/大砲不可<hr>	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:.+:1000:512:donguri=\d/4: EXT was configured )	$&, 任意レベル表示/大砲不可<hr>	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:.*:1000:512:: EXT was configured )	$&, レベル表示/大砲は板のデフォルト<hr>	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:.*:1000:512:donguri=\d/1: EXT was configured )	$&, 強制レベル表示/大砲可<hr>	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:.*:1000:512:donguri=\d/2: EXT was configured )	$&, 任意レベル表示/大砲可<hr>	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:.*:1000:512:donguri=\d/3: EXT was configured )	$&, 強制レベル表示/大砲不可<hr>	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:.*:1000:512:donguri=\d/4: EXT was configured )	$&, 任意レベル表示/大砲不可<hr>	msg
 //// Donguri level
-<rx>(<hr>VIPQ2_EXTDAT:.+:.+:1000:512:donguri=(\d)/\d: EXT was configured )	$&, 必要どんぐりレベル:$2	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:.*:1000:512:donguri=(\d)/\d: EXT was configured )	$&, 必要どんぐりレベル:$2	msg
 //// SLIP
-<rx>(<hr>VIPQ2_EXTDAT:.+:default:1000:512:donguri=\d/\d: EXT was configured )	$&, 板のデフォルトSLIP(ID末尾なし)	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:none:1000:512:donguri=\d/\d: EXT was configured )	$&, SLIPなし(ID末尾なし)	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:checked:1000:512:donguri=\d/\d: EXT was configured )	$&, SLIPなし(簡易ID末尾)	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:feature:1000:512:donguri=\d/\d: EXT was configured )	$&, SLIPなし(基本ID末尾)	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:verbose:1000:512:donguri=\d/\d: EXT was configured )	$&, SLIPなし(詳細ID末尾)	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:vvv:1000:512:donguri=\d/\d: EXT was configured )	$&, 回線種別のみ(詳細ID末尾)	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:vvvv:1000:512:donguri=\d/\d: EXT was configured )	$&, 回線種別+IP addr.(詳細ID末尾)	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:vvvvv:1000:512:donguri=\d/\d: EXT was configured )	$&, 回線種別+SLIP(詳細ID末尾)	msg
-<rx>(<hr>VIPQ2_EXTDAT:.+:vvvvvv:1000:512:donguri=\d/\d: EXT was configured )	$&, 回線種別+SLIP+IP addr.(詳細ID末尾)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*::1000:512:donguri=\d/\d: EXT was configured )	$&, 板のデフォルトSLIP(ID末尾なし)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:default:1000:512:donguri=\d/\d: EXT was configured )	$&, 板のデフォルトSLIP(ID末尾なし)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:none:1000:512:donguri=\d/\d: EXT was configured )	$&, SLIPなし(ID末尾なし)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:checked:1000:512:donguri=\d/\d: EXT was configured )	$&, SLIPなし(簡易ID末尾)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:feature:1000:512:donguri=\d/\d: EXT was configured )	$&, SLIPなし(基本ID末尾)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:verbose:1000:512:donguri=\d/\d: EXT was configured )	$&, SLIPなし(詳細ID末尾)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:vvv:1000:512:donguri=\d/\d: EXT was configured )	$&, 回線種別のみ(詳細ID末尾)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:vvvv:1000:512:donguri=\d/\d: EXT was configured )	$&, 回線種別+IP addr.(詳細ID末尾)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:vvvvv:1000:512:donguri=\d/\d: EXT was configured )	$&, 回線種別+SLIP(詳細ID末尾)	msg
+<rx>(<hr>VIPQ2_EXTDAT:.*:vvvvvv:1000:512:donguri=\d/\d: EXT was configured )	$&, 回線種別+SLIP+IP addr.(詳細ID末尾)	msg
 //// ID
-<rx>(<hr>VIPQ2_EXTDAT: default:.+:1000:1000:512:donguri=0/3: EXT was configured )	$&<hr>板のデフォルトID表示 	msg
-<rx>(<hr>VIPQ2_EXTDAT: none:.+:1000:512:donguri=0/3: EXT was configured )	$&<hr>IDなし 	msg
-<rx>(<hr>VIPQ2_EXTDAT: checked:.+:1000:512:donguri=0/3: EXT was configured )	$&<hr>強制ID 	msg
+<rx>(<hr>VIPQ2_EXTDAT: ::.*:1000:512:donguri=\d/\d: EXT was configured )	$&<hr>板のデフォルトID表示	msg
+<rx>(<hr>VIPQ2_EXTDAT: default:.*:1000:512:donguri=\d/\d: EXT was configured )	$&<hr>板のデフォルトID表示	msg
+<rx>(<hr>VIPQ2_EXTDAT: none:.*:1000:512:donguri=\d/\d: EXT was configured )	$&<hr>IDなし	msg
+<rx>(<hr>VIPQ2_EXTDAT: checked:.*:1000:512:donguri=\d/\d: EXT was configured )	$&<hr>強制ID	msg
+
+// Add "h" or "ht" to the top of URL
+<rx2>(?<!h)(ttps?://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	h$1	msg
+<rx2>(?<!ht)(tps?://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	ht$1	msg
+<rx2>(?<!(?:htt|sss))(ps?://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	htt$1	msg
+<rx2>(?<!http)(s://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	http$1	msg
+<rx2>(?<!(?:https|http|ttps|.tps|..ps|...s|.ftp|sssp))(://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	https$1	msg
+<rx2>(?<!(?:https:|http:|ttps:|.tps:|..ps:|...s:|.ftp:|sssp:))(//[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	https:$1	msg
