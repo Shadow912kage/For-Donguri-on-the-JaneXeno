@@ -1,4 +1,5 @@
 # RelplaceStr.txt and Script for Donguri, on the JaneXeno.
+ReplaceStrDonguri.txt と getdonguri.js は独立した存在ですので、それぞれ別個にインストール可能です。
 
 ## ReplaceStr.txt
 JaneXeno をインストールしているフォルダ下の ReplaceStr.txt へ ReplaceStrDonguri.txt の内容を追加してください(要、JaneXeno 再起動)。
