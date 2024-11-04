@@ -1,17 +1,23 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.3
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.4
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
 //	JaneXeno の ツール(O) > 設定(O)... > 機能 > コマンド で以下のように設定
 //	 コマンド名： どんぐり情報表示
 //		(任意の文字列)
-//	 実行するコマンド： wscript "$BASEPATHScript/getdonguri.js" $BURL $LOCALDAT
+//	 実行するコマンド： wscript "$BASEPATHScript/getdonguri.js" "$BURL" "$LOCALDAT"
 //		(2つ目のパラーメータは、JaneXeno をインストールしたフォルダ下の Script というフォルダに getdonguri.js というファイル名で置いた場合)
 //
 //  参考文献
+//
+//	 SETTING.TXT - ５ちゃんねるwiki
+//	 https://info.5ch.net/index.php/SETTING.TXT
+//	 BBS_SLIP - ５ちゃんねるwiki
+//	 https://info.5ch.net/index.php/BBS_SLIP
+//	 新生VIPQ2 - ５ちゃんねるwiki
+//	 https://info.5ch.net/index.php/%E6%96%B0%E7%94%9FVIPQ2#!extend:
+//
 //   コマンド - 5chどんぐり非公式まとめwiki
-//   https://donguri.wikiru.jp/index.php?command
-//   新生VIPQ2 - ５ちゃんねるwiki
-//   https://info.5ch.net/?curid=2759
+//   https://donguri.wikiru.jp/?command
 //
 //  1st res top 
 //   <> !extend:(ID):(SLIP):1000:512:donguri=(x/y) <br>
@@ -19,6 +25,11 @@
 //   <hr>VIPQ2_EXTDAT: (ID):(SLIP):1000:512:donguri=(x/y): EXT was configured <>
 //
 // 修正履歴
+//	ver.0.4: Added max res. number & max dat size informastions
+//         : Correct regexp. of required donguri level
+//	       : Added a process to handle commands with omitted parameters
+//         : Correct regex. of donguri level & cannon availability with omitted parameters
+//	ver.0.3.1: Corrected typo, "設定されいません" -> "設定されていません"
 //	ver.0.3: Added thread donguri informations from local dat file
 //         : Added a check on the number of arguments
 //	ver.0.2.1: Corrected typo, "SETTINT.TXT" -> "SETTING.TXT"
@@ -115,27 +126,33 @@ var DispDonguriInfo = {
 		var dat = fs.OpenTextFile(this.DatPath, 1, 0);
 		var dat1st = dat.ReadLine();
 		dat.Close();
-		var dngrtop = dat1st.match(/<> !extend:(.*?):(.*?):(?:1000)?:(?:512)?:(donguri=(\d)\/(\d))?:? <br>/);
-		var dngrbtm = dat1st.match(/<hr>VIPQ2_EXTDAT: (.+?):(.+?):1000:512:donguri=(\d)\/(\d): EXT was configured <>/);
+		var dngrtop = dat1st.match(/<> !extend:(.*?):(.*?):(\d+)?:(\d+)?(:donguri=(\d+)\/(\d))?:{0,2} <br>/);
+		var dngrbtm = dat1st.match(/<hr>VIPQ2_EXTDAT: (.+?):(.+?):(\d+):(\d+):(donguri=(\d+)\/(\d))?: EXT was configured <>/);
 		if (dngrtop) {
 			this.Id = dngrtop[1];
 			this.Slip = dngrtop[2];
-			if (dngrtop[3]) {
-				this.Dlevel = dngrtop[4];
-				this.Cannon = dngrtop[5];
+			this.Resmax = dngrtop[3] || "1000";
+			this.Datmax = dngrtop[4] || "512";
+			if (dngrtop[5]) {
+				this.Dlevel = dngrtop[6];
+				this.Cannon = dngrtop[7];
 			}
 		}
 		if (dngrbtm) {
 			this.Id = dngrbtm[1];
 			this.Slip = dngrbtm[2];
-			this.Dlevel = dngrbtm[3];
-			this.Cannon = dngrbtm[4];
+			this.Resmax = dngrbtm[3];
+			this.Datmax = dngrbtm[4];
+			if (dngrbtm[5]) {
+				this.Dlevel = dngrbtm[6];
+				this.Cannon = dngrbtm[7];
+			}
 		}
 	},
 	// Create described text of the Donguri
 	CreateDonguriTxt: function() {
 		// SETTING.TXT
-		var acorntxt = [" (どんぐりは設定されていません?)", " どんぐりレベル強制表示", " どんぐりレベル非表示(任意表示)"];
+		var acorntxt = [" (どんぐりは設定されていません?)", " どんぐりレベル強制表示", " どんぐりレベル非表示 (任意表示)"];
 		var vipq2txt = [" (デフォルト設定？)", " !chkBBx: が使用可\n", " !extend: 等が使用可\n", " VIPQQ2 コマンド使用時に、段位を表示\n",
 		" !chkBBx: 使用時にスマホ系はホスト名を一部変換\n", " (未実装？使用不可？)\n"];
 		var dontxt = "●掲示板設定 (SETTING.TXT)\n";
@@ -143,7 +160,7 @@ var DispDonguriInfo = {
 			dontxt += " BBS_ACORN=" + this.Acorn.toString() + "\n";
 			dontxt += acorntxt[this.Acorn] + "\n\n";
 		} else {
-			dontxt += " BBS_ACORN (どんぐり) は設定されいません\n\n";
+			dontxt += " BBS_ACORN (どんぐり) は設定されていません\n\n";
 		}
 		if (this.VipQ2) {
 			var vipq2key = 0;
@@ -163,7 +180,7 @@ var DispDonguriInfo = {
 		}
 		// !extend: command in 1st res. of local dat file
 		dontxt += "\n●スレッド情報 (!extend: コマンド)\n";
-		if (this.Id ||this.Slip || this.Dlevel || this.Cannon) {
+		if (this.Id || this.Slip || this.Dlevel || this.Cannon) {
 			switch (this.Id) {
 				case "none":
 					dontxt += " IDなし\n";
@@ -178,36 +195,39 @@ var DispDonguriInfo = {
 			}
 			switch (this.Slip) {
 				case "none":
-					dontxt += " SLIPなし(ID末尾なし)\n";
+					dontxt += " SLIPなし (ID末尾なし)\n";
 					break;
 				case "checked":
-					dontxt += " SLIPなし(簡易ID末尾)\n";
+					dontxt += " SLIPなし (簡易ID末尾)\n";
 					break;
 				case "feature":
-					dontxt += " SLIPなし(基本ID末尾)\n";
+					dontxt += " SLIPなし (基本ID末尾)\n";
 					break;
 				case "verbose":
-					dontxt += " SLIPなし(詳細ID末尾)\n";
+					dontxt += " SLIPなし (詳細ID末尾)\n";
 					break;
 				case "vvv":
-					dontxt += " 回線種別のみ(詳細ID末尾)\n";
+					dontxt += " 回線種別のみ (詳細ID末尾)\n";
 					break;
 				case "vvvv":
-					dontxt += " 回線種別+IP addr.(詳細ID末尾)\n";
+					dontxt += " 回線種別+IP addr. (詳細ID末尾)\n";
 					break;
 				case "vvvvv":
-					dontxt += " 回線種別+SLIP(詳細ID末尾)\n";
+					dontxt += " 回線種別+SLIP (詳細ID末尾)\n";
 					break;
 				case "vvvvvv":
-					dontxt += " 回線種別+SLIP+IP addr.(詳細ID末尾)\n";
+					dontxt += " 回線種別+SLIP+IP addr. (詳細ID末尾)\n";
 					break;
 				case "default":
 				case "on":
 				default:
-					dontxt += " 板のデフォルトSLIP(ID末尾なし)\n";
+					dontxt += " 板のデフォルトSLIP (ID末尾なし)\n";
 			}
+			dontxt += " レス上限：" + this.Resmax + "\n 最大datサイズ：" + this.Datmax + " KB\n";
 			if (this.Dlevel)
-				dontxt += " 必要どんぐりレベル:" + this.Dlevel + "\n";
+				dontxt += " 必要どんぐりレベル：" + this.Dlevel + "\n";
+			else
+				dontxt += " 必要どんぐりレベルは板のデフォルト\n"
 			switch (this.Cannon) {
 				case "1":
 					dontxt += " 強制レベル表示/大砲可\n";
@@ -234,7 +254,7 @@ var DispDonguriInfo = {
 var args = WScript.Arguments;
 if (args.length < 2) { // Arguments check
 	var thisname = WScript.ScriptName;
-	var message = "引数の数が足りません！\n\n使用法：\n " + thisname + " 5chの板のURL DATファイル名\n\nJaneXeno のコマンド設定例：\n" + " wscript \"$BASEPATHScript/" + thisname + "\" $BURL $LOCALDAT";
+	var message = "引数の数が足りません！\n\n使用法：\n " + thisname + " 5chの板のURL DATファイル名\n\nJaneXeno のコマンド設定例：\n" + " wscript \"$BASEPATHScript/" + thisname + "\" \"$BURL\" \"$LOCALDAT\"";
 	WScript.Echo(message);
 	WScript.Quit();
 }
