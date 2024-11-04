@@ -1,4 +1,4 @@
-// SETTING.TXT からどんぐり設定情報を取得、表示 ver.0.1
+// SETTING.TXT からどんぐり設定情報を取得、表示 ver.0.2
 //  Usage: getdonguri.js 5chの板のURL
 //
 //	JaneXeno の ツール(O) > 設定(O)... > 機能 > コマンド で以下のように設定
@@ -12,6 +12,10 @@
 //   https://donguri.wikiru.jp/index.php?command
 //   新生VIPQ2 - ５ちゃんねるwiki
 //   https://info.5ch.net/?curid=2759
+//
+// 修正履歴
+//  ver.0.2: Added timeout process
+//  ver.0.1: 1st release
 
 var DispDonguriInfo = {
 	// Initialize object
@@ -49,6 +53,17 @@ var DispDonguriInfo = {
 		if (!http) var USED_WINHTTP = false;
 		if (!http) try {http = new ActiveXObject("Msxml2.XMLHTTP.6.0");} catch (e) {}
 		if (!http) {http  = new ActiveXObject("Msxml2.XMLHTTP.3.0");}
+
+		var TIME_OUT = 3000; // 3000 msec
+		if (USED_WINHTTP) {
+			http.SetTimeouts(TIME_OUT, TIME_OUT, TIME_OUT, TIME_OUT);
+		} else {
+			http.timeout = TIME_OUT;
+			http.ontimeout = function() {
+				this.ErrMsg = "サーバーからの応答がありません";
+				this.DispErr();
+			};
+		}
 		try {
 			http.open("GET", this.SettingTxtUrl, true);
 			http.send();
@@ -56,10 +71,14 @@ var DispDonguriInfo = {
 			this.ErrMsg = "SETTING.TXTを取得できませんでした"
 			this.DispErr();
 		}
-		if (USED_WINHTTP)
-			http.WaitForResponse();
-		else
+		if (USED_WINHTTP) {
+			if (!http.WaitForResponse()) {
+				this.ErrMsg = "サーバーからの応答がありません";
+				this.DispErr();
+			}
+		} else {
 			while (http.ReadyState < 4) {}
+		}
 		// display dialog window
 		this.SettingTxt = http.ResponseText;
 		this.ParseSettingTxt();
@@ -82,7 +101,7 @@ var DispDonguriInfo = {
 	},
 	// Create described text of the Donguri
 	CreateDonguriTxt: function() {
-		var acorntxt = ["どんぐりは設定されていません", " どんぐりレベル強制表示", " どんぐりレベル非表示(任意表示)"];
+		var acorntxt = [" (どんぐりは設定されていません?)", " どんぐりレベル強制表示", " どんぐりレベル非表示(任意表示)"];
 		var vipq2txt = [" (デフォルト設定？)", " !chkBBx: が使用可\n", " !extend: 等が使用可\n", " VIPQQ2 コマンド使用時に、段位を表示\n",
 		" !chkBBx: 使用時にスマホ系はホスト名を一部変換\n", " (未実装？使用不可？)\n"];
 		var dontxt = "";
@@ -100,6 +119,8 @@ var DispDonguriInfo = {
 			if (this.VipQ2 > 3) vipq2key = 3;
 			if (this.VipQ2 > 7) vipq2key = 4;
 			if (this.VipQ2 > 255) vipq2key = 5;
+			if (vipq2key == 0)
+				vipq2tmp = vipq2txt[vipq2key];
 			for (var i = 0; i < vipq2key; i++)
 				vipq2tmp = vipq2tmp.concat(vipq2txt[i+1]);
 			dontxt = dontxt.concat(vipq2tmp);
