@@ -1,4 +1,6 @@
 # RelplaceStr.txt and Script for Donguri, on the JaneXeno.
+JaneXeno 用の !extend: コマンドを使用されたスレッドでの、どんぐり情報を表示するための ReplaceStr.txt 用のファイル ReplaceStrDonguri.txt と、掲示板での設定(SETTING.TXT)及び ReplaceStrDonguri.txt と同様の情報を表示するためのコマンドスクリプト getdonguri.js です。<br>
+<br>
 ReplaceStrDonguri.txt と getdonguri.js は独立した存在ですので、それぞれ別個にインストール可能です。
 
 ## ReplaceStr.txt
