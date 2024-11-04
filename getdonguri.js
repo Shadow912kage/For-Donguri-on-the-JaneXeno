@@ -1,4 +1,4 @@
-// SETTING.TXT からどんぐり設定情報を取得、表示 ver.0.2
+// SETTING.TXT からどんぐり設定情報を取得、表示 ver.0.2.1
 //  Usage: getdonguri.js 5chの板のURL
 //
 //	JaneXeno の ツール(O) > 設定(O)... > 機能 > コマンド で以下のように設定
@@ -14,6 +14,7 @@
 //   https://info.5ch.net/?curid=2759
 //
 // 修正履歴
+//	ver.0.2.1: Corrected typo, "SETTINT.TXT" -> "SETTING.TXT"
 //  ver.0.2: Added timeout process
 //  ver.0.1: 1st release
 
@@ -84,7 +85,7 @@ var DispDonguriInfo = {
 		this.ParseSettingTxt();
 		this.CreateDonguriTxt();
 		//this.Shell.Popup(this.SettingTxt, 0, "SETTING.TXT");
-		this.Shell.Popup(this.DonguriTxt, 0, "どんぐり情報 from SETTINT.TXT");
+		this.Shell.Popup(this.DonguriTxt, 0, "どんぐり情報 from SETTING.TXT");
 	},
 	// Parse SETTING.TXT
 	ParseSettingTxt: function() {
