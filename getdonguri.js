@@ -24,11 +24,15 @@
 //  1st res bottom
 //   <hr>VIPQ2_EXTDAT: (ID):(SLIP):1000:512:donguri=(x/y): EXT was configured <>
 //
+
+// <> sssp://img.5ch.net/ico/nida.gif <br> !extend:default:default:1000:512:donguri=0/4: <br>
+
 // èCê≥óöó
+//	ver.0.5: Corrected regexp with BE icon (sssp://~)
 //	ver.0.4: Added max res. number & max dat size informastions
 //         : Correct regexp. of required donguri level
 //	       : Added a process to handle commands with omitted parameters
-//         : Correct regex. of donguri level & cannon availability with omitted parameters
+//         : Correct regexps of donguri level & cannon availability with omitted parameters
 //	ver.0.3.1: Corrected typo, "ê›íËÇ≥ÇÍÇ¢Ç‹ÇπÇÒ" -> "ê›íËÇ≥ÇÍÇƒÇ¢Ç‹ÇπÇÒ"
 //	ver.0.3: Added thread donguri informations from local dat file
 //         : Added a check on the number of arguments
@@ -126,16 +130,16 @@ var DispDonguriInfo = {
 		var dat = fs.OpenTextFile(this.DatPath, 1, 0);
 		var dat1st = dat.ReadLine();
 		dat.Close();
-		var dngrtop = dat1st.match(/<> !extend:(.*?):(.*?):(\d+)?:(\d+)?(:donguri=(\d+)\/(\d))?:{0,2} <br>/);
+		var dngrtop = dat1st.match(/<>( sssp:\/\/img\.5ch\.net\/ico\/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)? !extend:(.*?):(.*?):(\d+)?:(\d+)?(:donguri=(\d+)\/(\d))?:{0,2} <br>/);
 		var dngrbtm = dat1st.match(/<hr>VIPQ2_EXTDAT: (.+?):(.+?):(\d+):(\d+):(donguri=(\d+)\/(\d))?: EXT was configured <>/);
 		if (dngrtop) {
-			this.Id = dngrtop[1];
-			this.Slip = dngrtop[2];
-			this.Resmax = dngrtop[3] || "1000";
-			this.Datmax = dngrtop[4] || "512";
-			if (dngrtop[5]) {
-				this.Dlevel = dngrtop[6];
-				this.Cannon = dngrtop[7];
+			this.Id = dngrtop[2];
+			this.Slip = dngrtop[3];
+			this.Resmax = dngrtop[4] || "1000";
+			this.Datmax = dngrtop[5] || "512";
+			if (dngrtop[6]) {
+				this.Dlevel = dngrtop[7];
+				this.Cannon = dngrtop[8];
 			}
 		}
 		if (dngrbtm) {

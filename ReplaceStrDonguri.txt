@@ -1,4 +1,4 @@
-// Donguri 0.5
+// Donguri 0.6
 //  1st res top 
 //   <> !extend:(ID):(SLIP):1000:512:donguri=(x/y) <br>
 //  1st res bottom
@@ -14,7 +14,12 @@
 //  コマンド - 5chどんぐり非公式まとめwiki
 //  https://donguri.wikiru.jp/?command
 
+// <> sssp://img.5ch.net/ico/nida.gif <br> !extend:default:default:1000:512:donguri=0/4: <br>
+//( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)
+
 // 修正履歴
+//	ver.0.6: Added regexps with BE icon (sssp://~). And handled JaneXeno's rendering issue.
+//         : Maybe, JaneXeno renders unnecessary whitespace between the <hr> and the hyperlink.
 //	ver.0.5: Added max res. number & max dat size informastions
 //	       : Correct regexps of donguri level & cannon availability with omitted parameters
 //  ver.0.4: Correct regexp. of required donguri level
@@ -24,35 +29,42 @@
 
 /// Res top
 //// Donguri cannon
+///// with BE icon
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)( !extend:.*?:.*?:(\d*)?:(\d*)?:{0,2} <br>)+	$&, レベル表示/大砲は板のデフォルト<hr><br>	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)( !extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/1:{0,2} <br>)+	$&, 強制レベル表示/大砲可<hr><br>	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)( !extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/2:{0,2} <br>)+	$&, 任意レベル表示/大砲可<hr><br>	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)( !extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/3:{0,2} <br>)+	$&, 強制レベル表示/大砲不可<hr><br>	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)( !extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/4:{0,2} <br>)+	$&, 任意レベル表示/大砲不可<hr><br>	msg
+///// w/o BE icon
 <rx>(?<!<br>)( !extend:.*?:.*?:(\d*)?:(\d*)?:{0,2} <br>)+	$&, レベル表示/大砲は板のデフォルト<hr>	msg
 <rx>(?<!<br>)( !extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/1:{0,2} <br>)+	$&, 強制レベル表示/大砲可<hr>	msg
 <rx>(?<!<br>)( !extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/2:{0,2} <br>)+	$&, 任意レベル表示/大砲可<hr>	msg
 <rx>(?<!<br>)( !extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/3:{0,2} <br>)+	$&, 強制レベル表示/大砲不可<hr>	msg
 <rx>(?<!<br>)( !extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/4:{0,2} <br>)+	$&, 任意レベル表示/大砲不可<hr>	msg
 //// Donguri level
-<rx>(?<!<br>)( !extend:.*?:.*?:(\d*)?:(\d*)?:{0,2} <br>)+	$&, 必要どんぐりレベルは板のデフォルト	msg
-<rx>(?<!<br>)( !extend:.*?:.*?:(\d*)?:(\d*)?(:donguri=(\d+)/\d):{0,2} <br>)+	$&, 必要どんぐりレベル:$5	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:.*?:(\d*)?:(\d*)?:{0,2} <br>)+	$&, 必要どんぐりレベルは板のデフォルト	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:.*?:(\d*)?:(\d*)?(:donguri=(\d+)/\d):{0,2} <br>)+	$&, 必要どんぐりレベル:$6	msg
 //// Max res. number & dat size
-<rx>(?<!<br>)( !extend:.*?:.*?:(\d+):(\d+)(:donguri=\d+/\d)?:? <br>)+	$&, レス上限:$2, 最大datサイズ:$3 KB	msg
-<rx>(?<!<br>)( !extend:.*?:.*?::(\d+)(:donguri=\d+/\d)?:? <br>)+	$&, レス上限:1000, 最大datサイズ:$2 KB	msg
-<rx>(?<!<br>)( !extend:.*?:.*?:(\d+):(:donguri=\d+/\d)?:? <br>)+	$&, レス上限:$2, 最大datサイズ:512 KB	msg
-<rx>(?<!<br>)( !extend:.*?:.*?::(:donguri=\d+/\d)?:? <br>)+	$&, レス上限:1000, 最大datサイズ:512 KB	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:.*?:(\d+):(\d+)(:donguri=\d+/\d)?:? <br>)+	$&, レス上限:$3, 最大datサイズ:$4 KB	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:.*?::(\d+)(:donguri=\d+/\d)?:? <br>)+	$&, レス上限:1000, 最大datサイズ:$3 KB	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:.*?:(\d+):(:donguri=\d+/\d)?:? <br>)+	$&, レス上限:$3, 最大datサイズ:512 KB	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:.*?::(:donguri=\d+/\d)?:? <br>)+	$&, レス上限:1000, 最大datサイズ:512 KB	msg
 //// SLIP
-<rx>(?<!<br>)( !extend:.*?::(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 板のデフォルトSLIP(ID末尾なし)	msg
-<rx>(?<!<br>)( !extend:.*?:(default|on):(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 板のデフォルトSLIP(ID末尾なし)	msg
-<rx>(?<!<br>)( !extend:.*?:none:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, SLIPなし(ID末尾なし)	msg
-<rx>(?<!<br>)( !extend:.*?:checked:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, SLIPなし(簡易ID末尾)	msg
-<rx>(?<!<br>)( !extend:.*?:feature:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, SLIPなし(基本ID末尾)	msg
-<rx>(?<!<br>)( !extend:.*?:verbose:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, SLIPなし(詳細ID末尾)	msg
-<rx>(?<!<br>)( !extend:.*?:vvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 回線種別のみ(詳細ID末尾)	msg
-<rx>(?<!<br>)( !extend:.*?:vvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 回線種別+IP addr.(詳細ID末尾)	msg
-<rx>(?<!<br>)( !extend:.*?:vvvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 回線種別+SLIP(詳細ID末尾)	msg
-<rx>(?<!<br>)( !extend:.*?:vvvvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 回線種別+SLIP+IP addr.(詳細ID末尾)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?::(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 板のデフォルトSLIP(ID末尾なし)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:(default|on):(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 板のデフォルトSLIP(ID末尾なし)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:none:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, SLIPなし(ID末尾なし)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:checked:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, SLIPなし(簡易ID末尾)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:feature:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, SLIPなし(基本ID末尾)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:verbose:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, SLIPなし(詳細ID末尾)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:vvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 回線種別のみ(詳細ID末尾)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:vvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 回線種別+IP addr.(詳細ID末尾)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:vvvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 回線種別+SLIP(詳細ID末尾)	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:.*?:vvvvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&, 回線種別+SLIP+IP addr.(詳細ID末尾)	msg
 //// ID
-<rx>(?<!<br>)( !extend::.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&<hr>板のデフォルトID表示	msg
-<rx>(?<!<br>)( !extend:(default|on):.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&<hr>板のデフォルトID表示	msg
-<rx>(?<!<br>)( !extend:none:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&<hr>IDなし	msg
-<rx>(?<!<br>)( !extend:checked:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&<hr>強制ID	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend::.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&<hr>板のデフォルトID表示	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:(default|on):.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&<hr>板のデフォルトID表示	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:none:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&<hr>IDなし	msg
+<rx>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?( !extend:checked:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2} <br>)+	$&<hr>強制ID	msg
 /// VIPQ2_EXTDAT
 //// Donguri cannon
 <rx>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:: EXT was configured )	$&, レベル表示/大砲は板のデフォルト<hr>	msg
@@ -79,11 +91,4 @@
 <rx>(<hr>VIPQ2_EXTDAT: default:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>板のデフォルトID表示	msg
 <rx>(<hr>VIPQ2_EXTDAT: none:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>IDなし	msg
 <rx>(<hr>VIPQ2_EXTDAT: checked:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>強制ID	msg
-
-// Add "h" or "ht" to the top of URL
-<rx2>(?<!h)(ttps?://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	h$1	msg
-<rx2>(?<!ht)(tps?://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	ht$1	msg
-<rx2>(?<!(?:htt|sss))(ps?://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	htt$1	msg
-<rx2>(?<!http)(s://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	http$1	msg
-<rx2>(?<!(?:https|http|ttps|.tps|..ps|...s|.ftp|sssp))(://[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	https$1	msg
-<rx2>(?<!(?:https:|http:|ttps:|.tps:|..ps:|...s:|.ftp:|sssp:))(//[-A-Za-z0-9\.]+(/([-A-Za-z0-9_!#\$%&'\(\)\[\]\*\+,\.:;=?])*)*)	https:$1	msg
+//	********** End Of Donguri **********
