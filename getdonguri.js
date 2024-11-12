@@ -1,23 +1,26 @@
-// SETTING.TXTã¨ã‚¹ãƒ¬ã® >>1 ã‹ã‚‰ã©ã‚“ãã‚Šè¨­å®šæƒ…å ±ã‚’å–å¾—ã€è¡¨ç¤º ver.0.5
-//  Usage: getdonguri.js 5chã®æ¿ã®URL ãƒ­ãƒ¼ã‚«ãƒ«ä¿å­˜ã•ã‚Œã¦ã„ã‚‹DATã®ãƒ‘ã‚¹
+// SETTING.TXT‚ÆƒXƒŒ‚Ì >>1 ‚©‚ç‚Ç‚ñ‚®‚èİ’èî•ñ‚ğæ“¾A•\¦ ver.0.6
+//  Usage: getdonguri.js 5ch‚Ì”Â‚ÌURL ƒ[ƒJƒ‹•Û‘¶‚³‚ê‚Ä‚¢‚éDAT‚ÌƒpƒX
 //
-//	JaneXeno ã® ãƒ„ãƒ¼ãƒ«(O) > è¨­å®š(O)... > æ©Ÿèƒ½ > ã‚³ãƒãƒ³ãƒ‰ ã§ä»¥ä¸‹ã®ã‚ˆã†ã«è¨­å®š
-//	 ã‚³ãƒãƒ³ãƒ‰åï¼š ã©ã‚“ãã‚Šæƒ…å ±è¡¨ç¤º
-//		(ä»»æ„ã®æ–‡å­—åˆ—)
-//	 å®Ÿè¡Œã™ã‚‹ã‚³ãƒãƒ³ãƒ‰ï¼š wscript "$BASEPATHScript/getdonguri.js" "$BURL" "$LOCALDAT"
-//		(2ã¤ç›®ã®ãƒ‘ãƒ©ãƒ¼ãƒ¡ãƒ¼ã‚¿ã¯ã€JaneXeno ã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ãŸãƒ•ã‚©ãƒ«ãƒ€ä¸‹ã® Script ã¨ã„ã†ãƒ•ã‚©ãƒ«ãƒ€ã« getdonguri.js ã¨ã„ã†ãƒ•ã‚¡ã‚¤ãƒ«åã§ç½®ã„ãŸå ´åˆ)
+//	JaneXeno ‚Ì ƒc[ƒ‹(O) > İ’è(O)... > ‹@”\ > ƒRƒ}ƒ“ƒh ‚ÅˆÈ‰º‚Ì‚æ‚¤‚Éİ’è
+//	 ƒRƒ}ƒ“ƒh–¼F ‚Ç‚ñ‚®‚èî•ñ•\¦
+//		(”CˆÓ‚Ì•¶š—ñ)
+//	 Às‚·‚éƒRƒ}ƒ“ƒhF wscript "$BASEPATHScript/getdonguri.js" "$BURL" "$LOCALDAT"
+//		(2‚Â–Ú‚Ìƒpƒ‰[ƒ[ƒ^‚ÍAJaneXeno ‚ğƒCƒ“ƒXƒg[ƒ‹‚µ‚½ƒtƒHƒ‹ƒ_‰º‚Ì Script ‚Æ‚¢‚¤ƒtƒHƒ‹ƒ_‚É getdonguri.js ‚Æ‚¢‚¤ƒtƒ@ƒCƒ‹–¼‚Å’u‚¢‚½ê‡)
 //
-//  å‚è€ƒæ–‡çŒ®
+//  Ql•¶Œ£
 //
-//	 SETTING.TXT - ï¼•ã¡ã‚ƒã‚“ã­ã‚‹wiki
+//	 SETTING.TXT - ‚T‚¿‚á‚ñ‚Ë‚éwiki
 //	 https://info.5ch.net/index.php/SETTING.TXT
-//	 BBS_SLIP - ï¼•ã¡ã‚ƒã‚“ã­ã‚‹wiki
+//	 BBS_SLIP - ‚T‚¿‚á‚ñ‚Ë‚éwiki
 //	 https://info.5ch.net/index.php/BBS_SLIP
-//	 æ–°ç”ŸVIPQ2 - ï¼•ã¡ã‚ƒã‚“ã­ã‚‹wiki
+//	 V¶VIPQ2 - ‚T‚¿‚á‚ñ‚Ë‚éwiki
 //	 https://info.5ch.net/index.php/%E6%96%B0%E7%94%9FVIPQ2#!extend:
 //
-//   ã‚³ãƒãƒ³ãƒ‰ - 5chã©ã‚“ãã‚Šéå…¬å¼ã¾ã¨ã‚wiki
+//   ƒRƒ}ƒ“ƒh - 5ch‚Ç‚ñ‚®‚è”ñŒö®‚Ü‚Æ‚ßwiki
 //   https://donguri.wikiru.jp/?command
+//
+//	 JScriptjScripting.FileSystemObject‚Å‚ÍUTF-8ƒeƒLƒXƒg•¶š‰»‚¯‚·‚éBADODB.Stream‚ğg‚¤B - °•à‰J•`
+//	 https://2ndart.hatenablog.com/entry/2022/08/07/155523
 //
 //  1st res top 
 //   <> !extend:(ID):(SLIP):1000:512:donguri=(x/y) <br>
@@ -25,15 +28,16 @@
 //   <hr>VIPQ2_EXTDAT: (ID):(SLIP):1000:512:donguri=(x/y): EXT was configured <>
 //
 
-// <> sssp://img.5ch.net/ico/nida.gif <br> !extend:default:default:1000:512:donguri=0/4: <br>
-
-// ä¿®æ­£å±¥æ­´
+// C³—š—ğ
+//	ver.0.6: Added general SETTING.TXT information, EXCEPT BBS_TITLE, BBS_TITLE_ORIG and BBS_NONAME_NAME
+//         : Corrected parsing for BBS_USE_VIPQ2, regex (\d) -> (\d+)
+//				 : WIP... stream and file access with ADODB
 //	ver.0.5: Corrected regexp with BE icon (sssp://~)
 //	ver.0.4: Added max res. number & max dat size informastions
 //         : Correct regexp. of required donguri level
 //	       : Added a process to handle commands with omitted parameters
 //         : Correct regexps of donguri level & cannon availability with omitted parameters
-//	ver.0.3.1: Corrected typo, "è¨­å®šã•ã‚Œã„ã¾ã›ã‚“" -> "è¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“"
+//	ver.0.3.1: Corrected typo, "İ’è‚³‚ê‚¢‚Ü‚¹‚ñ" -> "İ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ"
 //	ver.0.3: Added thread donguri informations from local dat file
 //         : Added a check on the number of arguments
 //	ver.0.2.1: Corrected typo, "SETTINT.TXT" -> "SETTING.TXT"
@@ -50,7 +54,7 @@ var DispDonguriInfo = {
 		this.ParseSettingTxt();
 		this.GetDatDonguri();
 		this.CreateDonguriTxt();
-		this.Shell.Popup(this.DonguriTxt, 0, "ã©ã‚“ãã‚Šæƒ…å ±");
+		this.Shell.Popup(this.DonguriTxt, 0, "‚Ç‚ñ‚®‚èî•ñ");
 	},
 	// Initialize object
 	Init: function() {
@@ -64,14 +68,17 @@ var DispDonguriInfo = {
 			this.ServerName = Urls[1];
 			this.BoardName = Urls[2];
 			this.SettingTxtUrl = this.BoardUrl + "SETTING.TXT";
+			/* The Content-Type header is ineffective for getting SETTING.TXT at least on the 5ch.
+			this.ReqHeaders = {"content-type" : "text/plain; charset=shift_jis"};
+			*/
 		} else {
-			this.ErrMsg = "5ã¡ã‚ƒã‚“ã­ã‚‹ã®æ²ç¤ºæ¿ã§ã¯ã‚ã‚Šã¾ã›ã‚“";
+			this.ErrMsg = "5‚¿‚á‚ñ‚Ë‚é‚ÌŒf¦”Â‚Å‚Í‚ ‚è‚Ü‚¹‚ñ";
 			this.DispErr();
 		};
 	},
 	// Display error message & quit process
 	DispErr: function() {
-		this.Shell.Popup(this.ErrMsg, 0, "ã‚¨ãƒ©ãƒ¼");
+		this.Shell.Popup(this.ErrMsg, 0, "ƒGƒ‰[");
 		WScript.Quit();
 	},
 	// Get SETTING.TXT, ref. gethtmldat.js
@@ -90,39 +97,88 @@ var DispDonguriInfo = {
 		} else {
 			http.timeout = TIME_OUT;
 			http.ontimeout = function() {
-				this.ErrMsg = "ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰ã®å¿œç­”ãŒã‚ã‚Šã¾ã›ã‚“";
+				this.ErrMsg = "ƒT[ƒo[‚©‚ç‚Ì‰“š‚ª‚ ‚è‚Ü‚¹‚ñ";
 				this.DispErr();
 			};
 		}
 		try {
 			http.open("GET", this.SettingTxtUrl, true);
+			/* The Content-Type header is ineffective for getting SETTING.TXT at least on the 5ch.
+			for (i in this.ReqHeaders)
+				http.setRequestHeader(i, this.ReqHeaders[i]);
+			*/
 			http.send();
 		} catch (e) {
-			this.ErrMsg = "SETTING.TXTã‚’å–å¾—ã§ãã¾ã›ã‚“ã§ã—ãŸ"
+			this.ErrMsg = "SETTING.TXT‚ğæ“¾‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½"
 			this.DispErr();
 		}
 		if (USED_WINHTTP) {
 			if (!http.WaitForResponse()) {
-				this.ErrMsg = "ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰ã®å¿œç­”ãŒã‚ã‚Šã¾ã›ã‚“";
+				this.ErrMsg = "ƒT[ƒo[‚©‚ç‚Ì‰“š‚ª‚ ‚è‚Ü‚¹‚ñ";
 				this.DispErr();
 			}
 		} else {
 			while (http.ReadyState < 4) {}
 		}
+		// The response header(.headers) of SETTING.TXT is empty... So the WinHttp treat strings as us-ascii.
 		this.SettingTxt = http.ResponseText;
+		/*
+		var buf = http.ResponseBody;
+		var strm = new ActiveXObject("ADODB.Stream");
+		strm.Type = 2;
+		strm.charset = "shift_jis";
+		strm.Open();
+		strm.WriteText(buf);
+		strm.SaveToFile("SETTING.TXT", 2);
+		strm.Close();
+		*/
 	},
 	// Parse SETTING.TXT
 	ParseSettingTxt: function() {
+		// Donguri
 		var acorn = this.SettingTxt.match(/BBS_ACORN=(\d)/);
-		var vipq2 = this.SettingTxt.match(/BBS_USE_VIPQ2=(\d)/);
+		var vipq2 = this.SettingTxt.match(/BBS_USE_VIPQ2=(\d+)/);
 		if (acorn)
 			this.Acorn = acorn[1];
-		else
-			this.Acorn = null;
 		if (vipq2)
 			this.VipQ2 = vipq2[1];
-		else
-			this.VipQ2 = null;
+
+		// Other board settings
+		/* EXCEPT BBS_TITLE, BBS_TITLE_ORIG and BBS_NONAME_NAME
+		var title = this.SettingTxt.match(/BBS_TITLE=(.+)/);
+		if (title)
+			this.Title = title[1];
+		var titleorig = this.SettingTxt.match(/BBS_TITLE_ORIG=(.+)/);
+		if (titleorig)
+			this.TitleOrig = titleorig[1];
+		var noname = this.SettingTxt.match(/BBS_NONAME_NAME=(.+)/);
+		if (noname)
+			this.NoName = noname[1];
+		*/
+		var maxrows = this.SettingTxt.match(/BBS_LINE_NUMBER=(\d+)/);
+		if (maxrows)
+			this.MaxRows = parseInt(maxrows[1]) * 2;
+		var namelen = this.SettingTxt.match(/BBS_NAME_COUNT=(\d+)/);
+		if (namelen)
+			this.NameLen = namelen[1];
+		var ressize = this.SettingTxt.match(/BBS_MESSAGE_COUNT=(\d+)/);
+		if (ressize)
+			this.ResSize = ressize[1];
+		var slip = this.SettingTxt.match(/BBS_SLIP=(.+)/);
+		if (slip)
+			this.SLIP = slip[1];
+		var dispip = this.SettingTxt.match(/BBS_DISP_IP=(.+)/);
+		if (dispip)
+			this.DispIP = dispip[1];
+		var forceid = this.SettingTxt.match(/BBS_FORCE_ID=(.+)/);
+		if (forceid)
+			this.ForceID = forceid[1];
+		var beid = this.SettingTxt.match(/BBS_BE_ID=(\d)/);
+		if (beid)
+			this.BEID = beid[1];
+		var noid = this.SettingTxt.match(/BBS_NO_ID=(.+)/);
+		if (noid)
+			this.NoID = noid[1];
 	},
 	// Get 1st res. of local dat and parse it
 	GetDatDonguri: function() {
@@ -156,15 +212,44 @@ var DispDonguriInfo = {
 	// Create described text of the Donguri
 	CreateDonguriTxt: function() {
 		// SETTING.TXT
-		var acorntxt = [" (ã©ã‚“ãã‚Šã¯è¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“?)", " ã©ã‚“ãã‚Šãƒ¬ãƒ™ãƒ«å¼·åˆ¶è¡¨ç¤º", " ã©ã‚“ãã‚Šãƒ¬ãƒ™ãƒ«éè¡¨ç¤º (ä»»æ„è¡¨ç¤º)"];
-		var vipq2txt = [" (ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆè¨­å®šï¼Ÿ)", " !chkBBx: ãŒä½¿ç”¨å¯\n", " !extend: ç­‰ãŒä½¿ç”¨å¯\n", " VIPQQ2 ã‚³ãƒãƒ³ãƒ‰ä½¿ç”¨æ™‚ã«ã€æ®µä½ã‚’è¡¨ç¤º\n",
-		" !chkBBx: ä½¿ç”¨æ™‚ã«ã‚¹ãƒãƒ›ç³»ã¯ãƒ›ã‚¹ãƒˆåã‚’ä¸€éƒ¨å¤‰æ›\n", " (æœªå®Ÿè£…ï¼Ÿä½¿ç”¨ä¸å¯ï¼Ÿ)\n"];
-		var dontxt = "â—æ²ç¤ºæ¿è¨­å®š (SETTING.TXT)\n";
+		/// Other settings
+		var dontxt = "œŒf¦”Âİ’è (SETTING.TXT)\n";
+		/* EXCEPT BBS_TITLE, BBS_TITLE_ORIG and BBS_NONAME_NAME
+		if (this.Title)
+				dontxt += " ”Â–¼F" + this.Title;
+			if (this.TitleOrig)
+				dontxt += " (" + this.TitleOrig + ")";
+			dontxt += "\n";
+		if (this.NoName)
+			dontxt += " ƒfƒtƒHƒ‹ƒg–¼–³‚µF"  + this.NoName + "\n";
+		*/
+		if (this.MaxRows)
+			dontxt += " Å‘ås”F" + this.MaxRows + "\n";
+		if (this.NameLen)
+			dontxt += " –¼‘OÅ‘åƒoƒCƒg”F" + this.NameLen + "\n";
+		if (this.ResSize)
+			dontxt += " –{•¶Å‘åƒoƒCƒg”F" + this.ResSize + "\n";
+		if (this.SLIP)
+			dontxt += " SLIPF" + this.SLIP + "\n";
+		if (this.DispIP)
+			dontxt += " ‹­§ IP addr.•\¦F" + this.DispIP + "\n";
+		if (this.ForceID)
+			dontxt += " ‹­§ ID •\¦F" + this.ForceID + "\n";
+		if (this.BEID)
+			dontxt += " BEƒƒOƒCƒ“F" + this.BEID + "\n";
+		if (this.NoID)
+			dontxt += " ID”ñ•\¦F" + this.NoID + "\n";
+
+		/// Donguri
+		var acorntxt = [" (‚Ç‚ñ‚®‚è‚Íİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ?)", " ‚Ç‚ñ‚®‚èƒŒƒxƒ‹‹­§•\¦", " ‚Ç‚ñ‚®‚èƒŒƒxƒ‹”ñ•\¦ (”CˆÓ•\¦)"];
+		var vipq2txt = [" (ƒfƒtƒHƒ‹ƒgİ’èH)", " !chkBBx: ‚ªg—p‰Â\n", " !extend: “™‚ªg—p‰Â\n", " VI1PQ2 ƒRƒ}ƒ“ƒhg—p‚ÉA’iˆÊ‚ğ•\¦\n",
+		" !chkBBx: g—p‚ÉƒXƒ}ƒzŒn‚ÍƒzƒXƒg–¼‚ğˆê•”•ÏŠ·\n", " (–¢À‘•Hg—p•s‰ÂH)\n"];
+		dontxt += "\nœ‚Ç‚ñ‚®‚èŠÖ˜Aİ’è (SETTING.TXT)\n";
 		if (this.Acorn) {
 			dontxt += " BBS_ACORN=" + this.Acorn.toString() + "\n";
 			dontxt += acorntxt[this.Acorn] + "\n\n";
 		} else {
-			dontxt += " BBS_ACORN (ã©ã‚“ãã‚Š) ã¯è¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“\n\n";
+			dontxt += " BBS_ACORN (‚Ç‚ñ‚®‚è) ‚Íİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ\n\n";
 		}
 		if (this.VipQ2) {
 			var vipq2key = 0;
@@ -180,76 +265,76 @@ var DispDonguriInfo = {
 				vipq2tmp = vipq2tmp + vipq2txt[i+1];
 			dontxt += vipq2tmp;
 		} else {
-			dontxt += " BBS_USE_VIPQ2 (VIPQ2ã‚³ãƒãƒ³ãƒ‰) ã¯è¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“\n";
+			dontxt += " BBS_USE_VIPQ2 (VIPQ2ƒRƒ}ƒ“ƒh) ‚Íİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ\n";
 		}
 		// !extend: command in 1st res. of local dat file
-		dontxt += "\nâ—ã‚¹ãƒ¬ãƒƒãƒ‰æƒ…å ± (!extend: ã‚³ãƒãƒ³ãƒ‰)\n";
+		dontxt += "\nœƒXƒŒƒbƒhî•ñ (!extend: ƒRƒ}ƒ“ƒh)\n";
 		if (this.Id || this.Slip || this.Dlevel || this.Cannon) {
 			switch (this.Id) {
 				case "none":
-					dontxt += " IDãªã—\n";
+					dontxt += " ID‚È‚µ\n";
 					break;
 				case "checked":
-					dontxt += " å¼·åˆ¶ID\n";
+					dontxt += " ‹­§ID\n";
 					break;
 				case "default":
 				case "on":
 				default:
-					dontxt += " æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆIDè¡¨ç¤º\n";
+					dontxt += " ”Â‚ÌƒfƒtƒHƒ‹ƒgID•\¦\n";
 			}
 			switch (this.Slip) {
 				case "none":
-					dontxt += " SLIPãªã— (IDæœ«å°¾ãªã—)\n";
+					dontxt += " SLIP‚È‚µ (ID––”ö‚È‚µ)\n";
 					break;
 				case "checked":
-					dontxt += " SLIPãªã— (ç°¡æ˜“IDæœ«å°¾)\n";
+					dontxt += " SLIP‚È‚µ (ŠÈˆÕID––”ö)\n";
 					break;
 				case "feature":
-					dontxt += " SLIPãªã— (åŸºæœ¬IDæœ«å°¾)\n";
+					dontxt += " SLIP‚È‚µ (Šî–{ID––”ö)\n";
 					break;
 				case "verbose":
-					dontxt += " SLIPãªã— (è©³ç´°IDæœ«å°¾)\n";
+					dontxt += " SLIP‚È‚µ (Ú×ID––”ö)\n";
 					break;
 				case "vvv":
-					dontxt += " å›ç·šç¨®åˆ¥ã®ã¿ (è©³ç´°IDæœ«å°¾)\n";
+					dontxt += " ‰ñüí•Ê‚Ì‚İ (Ú×ID––”ö)\n";
 					break;
 				case "vvvv":
-					dontxt += " å›ç·šç¨®åˆ¥+IP addr. (è©³ç´°IDæœ«å°¾)\n";
+					dontxt += " ‰ñüí•Ê+IP addr. (Ú×ID––”ö)\n";
 					break;
 				case "vvvvv":
-					dontxt += " å›ç·šç¨®åˆ¥+SLIP (è©³ç´°IDæœ«å°¾)\n";
+					dontxt += " ‰ñüí•Ê+SLIP (Ú×ID––”ö)\n";
 					break;
 				case "vvvvvv":
-					dontxt += " å›ç·šç¨®åˆ¥+SLIP+IP addr. (è©³ç´°IDæœ«å°¾)\n";
+					dontxt += " ‰ñüí•Ê+SLIP+IP addr. (Ú×ID––”ö)\n";
 					break;
 				case "default":
 				case "on":
 				default:
-					dontxt += " æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆSLIP (IDæœ«å°¾ãªã—)\n";
+					dontxt += " ”Â‚ÌƒfƒtƒHƒ‹ƒgSLIP (ID––”ö‚È‚µ)\n";
 			}
-			dontxt += " ãƒ¬ã‚¹ä¸Šé™ï¼š" + this.Resmax + "\n æœ€å¤§datã‚µã‚¤ã‚ºï¼š" + this.Datmax + " KB\n";
+			dontxt += " ƒŒƒXãŒÀF" + this.Resmax + "\n Å‘ådatƒTƒCƒYF" + this.Datmax + " KB\n";
 			if (this.Dlevel)
-				dontxt += " å¿…è¦ã©ã‚“ãã‚Šãƒ¬ãƒ™ãƒ«ï¼š" + this.Dlevel + "\n";
+				dontxt += " •K—v‚Ç‚ñ‚®‚èƒŒƒxƒ‹F" + this.Dlevel + "\n";
 			else
-				dontxt += " å¿…è¦ã©ã‚“ãã‚Šãƒ¬ãƒ™ãƒ«ã¯æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ\n"
+				dontxt += " •K—v‚Ç‚ñ‚®‚èƒŒƒxƒ‹‚Í”Â‚ÌƒfƒtƒHƒ‹ƒg\n"
 			switch (this.Cannon) {
 				case "1":
-					dontxt += " å¼·åˆ¶ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯\n";
+					dontxt += " ‹­§ƒŒƒxƒ‹•\¦/‘å–C‰Â\n";
 					break;
 				case "2":
-					dontxt += " ä»»æ„ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯\n";
+					dontxt += " ”CˆÓƒŒƒxƒ‹•\¦/‘å–C‰Â\n";
 					break;
 				case "3":
-					dontxt += " å¼·åˆ¶ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²ä¸å¯\n";
+					dontxt += " ‹­§ƒŒƒxƒ‹•\¦/‘å–C•s‰Â\n";
 					break;
 				case "4":
-					dontxt += " ä»»æ„ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²ä¸å¯\n";
+					dontxt += " ”CˆÓƒŒƒxƒ‹•\¦/‘å–C•s‰Â\n";
 					break;
 				default:
-					dontxt += " ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²ã¯æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ\n";
+					dontxt += " ƒŒƒxƒ‹•\¦/‘å–C‚Í”Â‚ÌƒfƒtƒHƒ‹ƒg\n";
 			}
 		} else {
-			dontxt += " !extend: ã‚³ãƒãƒ³ãƒ‰ã¯ä½¿ç”¨ã•ã‚Œã¦ã„ã¾ã›ã‚“";
+			dontxt += " !extend: ƒRƒ}ƒ“ƒh‚Íg—p‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ";
 		}
 		this.DonguriTxt = dontxt;
 	}
@@ -258,7 +343,7 @@ var DispDonguriInfo = {
 var args = WScript.Arguments;
 if (args.length < 2) { // Arguments check
 	var thisname = WScript.ScriptName;
-	var message = "å¼•æ•°ã®æ•°ãŒè¶³ã‚Šã¾ã›ã‚“ï¼\n\nä½¿ç”¨æ³•ï¼š\n " + thisname + " 5chã®æ¿ã®URL DATãƒ•ã‚¡ã‚¤ãƒ«å\n\nJaneXeno ã®ã‚³ãƒãƒ³ãƒ‰è¨­å®šä¾‹ï¼š\n" + " wscript \"$BASEPATHScript/" + thisname + "\" \"$BURL\" \"$LOCALDAT\"";
+	var message = "ˆø”‚Ì”‚ª‘«‚è‚Ü‚¹‚ñI\n\ng—p–@F\n " + thisname + " 5ch‚Ì”Â‚ÌURL DATƒtƒ@ƒCƒ‹–¼\n\nJaneXeno ‚ÌƒRƒ}ƒ“ƒhİ’è—áF\n" + " wscript \"$BASEPATHScript/" + thisname + "\" \"$BURL\" \"$LOCALDAT\"";
 	WScript.Echo(message);
 	WScript.Quit();
 }
