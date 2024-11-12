@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.1
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
 //	JaneXeno の ツール(O) > 設定(O)... > 機能 > コマンド で以下のように設定
@@ -29,6 +29,7 @@
 //
 
 // 修正履歴
+//	ver.0.6.1: Added BBS_MAIL_COUNT
 //	ver.0.6: Added general SETTING.TXT information, EXCEPT BBS_TITLE, BBS_TITLE_ORIG and BBS_NONAME_NAME
 //         : Corrected parsing for BBS_USE_VIPQ2, regex (\d) -> (\d+)
 //				 : WIP... stream and file access with ADODB
@@ -161,6 +162,9 @@ var DispDonguriInfo = {
 		var namelen = this.SettingTxt.match(/BBS_NAME_COUNT=(\d+)/);
 		if (namelen)
 			this.NameLen = namelen[1];
+		var maillen = this.SettingTxt.match(/BBS_MAIL_COUNT=(\d+)/);
+		if (maillen)
+			this.MailLen = maillen[1];
 		var ressize = this.SettingTxt.match(/BBS_MESSAGE_COUNT=(\d+)/);
 		if (ressize)
 			this.ResSize = ressize[1];
@@ -223,10 +227,12 @@ var DispDonguriInfo = {
 		if (this.NoName)
 			dontxt += " デフォルト名無し："  + this.NoName + "\n";
 		*/
-		if (this.MaxRows)
-			dontxt += " 最大行数：" + this.MaxRows + "\n";
 		if (this.NameLen)
 			dontxt += " 名前最大バイト数：" + this.NameLen + "\n";
+		if (this.MailLen)
+			dontxt += " メール最大バイト数：" + this.MailLen + "\n";
+		if (this.MaxRows)
+			dontxt += " 最大行数：" + this.MaxRows + "\n";
 		if (this.ResSize)
 			dontxt += " 本文最大バイト数：" + this.ResSize + "\n";
 		if (this.SLIP)
