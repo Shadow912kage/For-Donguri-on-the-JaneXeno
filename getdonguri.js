@@ -1,4 +1,5 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.1
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.2pre.1
+//
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
 //	JaneXeno の ツール(O) > 設定(O)... > 機能 > コマンド で以下のように設定
@@ -23,12 +24,20 @@
 //	 https://2ndart.hatenablog.com/entry/2022/08/07/155523
 //
 //  1st res top 
-//   <> !extend:(ID):(SLIP):1000:512:donguri=(x/y) <br>
+//   <>( sssp://img.5ch.net/ico/IMAGE.FILE(BE icon) <br>) !extend:(ID):(SLIP):(Max res. num.):(Max dat size KB):(donguri=x/y)(:) <br>
 //  1st res bottom
-//   <hr>VIPQ2_EXTDAT: (ID):(SLIP):1000:512:donguri=(x/y): EXT was configured <>
+//   <hr>VIPQ2_EXTDAT: ID:SLIP:Max res. num.:Max dat size KB:donguri=x/y: EXT was configured <>
 //
 
 // 修正履歴
+//	ver.0.6.2pre.1
+//           : Changed descriptions of SETTING.TXT,
+//	         : 名前最大バイト数 -> 名前欄最大バイト数,  メール最大バイト数 -> メール欄最大バイト数, 最大行数 -> 本文最大行数
+//	         : Added version number display to the dialog window
+//           : Added stream and file access with ADODB for JaneXeno's local setting.txt file
+//           : Added BBS_TITLE, BBS_TITLE_ORIG and BBS_NONAME_NAME
+//           : Added thread URL information
+//           : WIP... processing SETTING.TXT from 5ch
 //	ver.0.6.1: Added BBS_MAIL_COUNT
 //	ver.0.6: Added general SETTING.TXT information, EXCEPT BBS_TITLE, BBS_TITLE_ORIG and BBS_NONAME_NAME
 //         : Corrected parsing for BBS_USE_VIPQ2, regex (\d) -> (\d+)
@@ -46,6 +55,8 @@
 //  ver.0.1: 1st release
 
 var DispDonguriInfo = {
+	// version number of getdonguri.js
+	Version: "0.6.2pre.1",
 	// Display donguri informations
 	Disp: function() {
 		// initalize
@@ -55,23 +66,22 @@ var DispDonguriInfo = {
 		this.ParseSettingTxt();
 		this.GetDatDonguri();
 		this.CreateDonguriTxt();
-		this.Shell.Popup(this.DonguriTxt, 0, "どんぐり情報");
+		this.Shell.Popup(this.DonguriTxt, 0, this.WinTitle);
 	},
 	// Initialize object
 	Init: function() {
+		this.WinTitle = "どんぐり情報 (" + WScript.ScriptName + " ver." + this.Version + ")",
 		this.Shell = new ActiveXObject("WScript.Shell");
 		this.ErrMsg = null;
 		this.ParseUrl();
 	},
 	ParseUrl:	function() {
-		var Urls = this.BoardUrl.match(/https:\/\/([-A-Za-z0-9]+)\.5ch\.net\/([-A-Za-z0-9]+)\//);
+		var Urls = this.BoardUrl.match(/https:\/\/(([-A-Za-z0-9]+)\.5ch\.net)\/([-A-Za-z0-9]+)\//);
 		if (Urls) {
-			this.ServerName = Urls[1];
-			this.BoardName = Urls[2];
+			this.ServerFullName = Urls[1]
+			this.ServerName = Urls[2];
+			this.BoardName = Urls[3];
 			this.SettingTxtUrl = this.BoardUrl + "SETTING.TXT";
-			/* The Content-Type header is ineffective for getting SETTING.TXT at least on the 5ch.
-			this.ReqHeaders = {"content-type" : "text/plain; charset=shift_jis"};
-			*/
 		} else {
 			this.ErrMsg = "5ちゃんねるの掲示板ではありません";
 			this.DispErr();
@@ -82,8 +92,36 @@ var DispDonguriInfo = {
 		this.Shell.Popup(this.ErrMsg, 0, "エラー");
 		WScript.Quit();
 	},
-	// Get SETTING.TXT, ref. gethtmldat.js
+	// Get SETTING.TXT
 	GetSettingTxt: function() {
+		var settingtxt = this.GetLocalSettingTxt();
+		if (settingtxt)
+			this.SettingTxt = settingtxt;
+		else
+			this.SettingTxt = this.Get5chSettingTxt();
+	},
+	// Get a setting.txt file on the JaneXeno's local board folder.
+	GetLocalSettingTxt: function() {
+		var lbpath = this.DatPath.match(/(.+\\)((\d+)\.dat)/);
+		if (lbpath) {
+			var lSettinTxtPath = lbpath[1] + "setting.txt"; // SETTING.TXT on the JaneXeno
+			this.DatFileName = lbpath[2]; // .dat filename
+			this.DatNumber = lbpath[3]; // .dat number (The integer part of UNIX time divided by 1000)
+			this.ThreadTime = new Date(lbpath[3] * 1000); // The date and time the thread was created
+			var strm = new ActiveXObject("ADODB.Stream");
+			strm.Type = 2; // text
+			strm.charset = "shift_jis";
+			strm.Open();
+			strm.LoadFromFile(lSettinTxtPath);
+			var settingTxt = strm.ReadText(-1); // read all
+			strm.Close();
+			//this.Shell.Popup(settingTxt, 0, "setting.txt");
+			return (settingTxt);
+		}
+		return (null);
+	},
+	// Get a SETTING.TXT on the 5ch board resource. Ref. gethtmldat.js
+	Get5chSettingTxt: function() {
 		var USED_WINHTTP = true;
 		try {http = new ActiveXObject("WinHttp.WinHttpRequest.5.1");} catch (e) {}
 		if (!http) try {http = new ActiveXObject("Msxml2.ServerXMLHTTP.6.0");} catch (e) {}
@@ -105,12 +143,16 @@ var DispDonguriInfo = {
 		try {
 			http.open("GET", this.SettingTxtUrl, true);
 			/* The Content-Type header is ineffective for getting SETTING.TXT at least on the 5ch.
+			this.ReqHeaders = {"content-type" : "text/plain; charset=shift_jis"};
+			this.UserAgent = "Monazilla/1.00 GetDonguri.Js/" + this.Version + " Windows/10.0.25330";
+			*/
+			/* The Content-Type header is ineffective for getting SETTING.TXT at least on the 5ch.
 			for (i in this.ReqHeaders)
 				http.setRequestHeader(i, this.ReqHeaders[i]);
 			*/
 			http.send();
 		} catch (e) {
-			this.ErrMsg = "SETTING.TXTを取得できませんでした"
+			this.ErrMsg = "SETTING.TXTを取得できませんでした\nエラーコード：" + e;
 			this.DispErr();
 		}
 		if (USED_WINHTTP) {
@@ -122,17 +164,25 @@ var DispDonguriInfo = {
 			while (http.ReadyState < 4) {}
 		}
 		// The response header(.headers) of SETTING.TXT is empty... So the WinHttp treat strings as us-ascii.
-		this.SettingTxt = http.ResponseText;
+		var settingTxt = http.ResponseText;
 		/*
+		// NOooo... THERE IS a setting.txt file encoded with Shift_JIS in the JaneXeno's local board folder.
+		//==========
+		// The ResponseBody is in some mysterious state: Shift_JIS (the original encoding) encoded with UTF-16LE BOM encoding.
+		// Probably because the HTTP communication is without a "content-type" header, the sending site sends it in Shift_JIS,
+		// and the receiving local side processes it as is with UTF-16LE BOM.
 		var buf = http.ResponseBody;
 		var strm = new ActiveXObject("ADODB.Stream");
-		strm.Type = 2;
-		strm.charset = "shift_jis";
+		strm.Type = 2; // text
+//		strm.charset = "shift_jis";
+//		strm.charset = "utf-8";
+		strm.charset = "utf-16";
 		strm.Open();
 		strm.WriteText(buf);
-		strm.SaveToFile("SETTING.TXT", 2);
+		strm.SaveToFile("SETTING.TXT", 2); // When running via WScript, you need to specify a folder where you have full access permissions.
 		strm.Close();
 		*/
+		return (settingTxt);
 	},
 	// Parse SETTING.TXT
 	ParseSettingTxt: function() {
@@ -145,17 +195,21 @@ var DispDonguriInfo = {
 			this.VipQ2 = vipq2[1];
 
 		// Other board settings
-		/* EXCEPT BBS_TITLE, BBS_TITLE_ORIG and BBS_NONAME_NAME
-		var title = this.SettingTxt.match(/BBS_TITLE=(.+)/);
-		if (title)
-			this.Title = title[1];
+		var title1 = this.SettingTxt.match(/BBS_TITLE=(.+)([@＠][25]ch掲示板)/);
+		var title3 = this.SettingTxt.match(/BBS_TITLE=(.+)/);
+		if (title1) {
+			this.Title = title1[1];
+			var title2 = title1[1].match(/(.+)((\(|（)仮(\)|）))/);
+			if (title2)
+				this.Title = title2[1];
+		} else if (title3)
+			this.Title = title3[1];
 		var titleorig = this.SettingTxt.match(/BBS_TITLE_ORIG=(.+)/);
 		if (titleorig)
 			this.TitleOrig = titleorig[1];
 		var noname = this.SettingTxt.match(/BBS_NONAME_NAME=(.+)/);
 		if (noname)
 			this.NoName = noname[1];
-		*/
 		var maxrows = this.SettingTxt.match(/BBS_LINE_NUMBER=(\d+)/);
 		if (maxrows)
 			this.MaxRows = parseInt(maxrows[1]) * 2;
@@ -215,32 +269,47 @@ var DispDonguriInfo = {
 	},
 	// Create described text of the Donguri
 	CreateDonguriTxt: function() {
+		// URL information
+		var dontxt = "●URL情報\n";
+		dontxt += " 掲示板URL：" + this.BoardUrl + "\n";
+		dontxt += " サーバー名：" + this.ServerFullName + "\n";
+		dontxt += " 掲示板名：" + this.BoardName + "\n";
+		dontxt += " dat番号：" + this.DatNumber + "\n";
+		var jpnDay = ["日", "月", "火", "水", "木", "金", "土"];
+		var ThrdFormTime = this.ThreadTime.getFullYear() + "/" + zeroPad(Number(this.ThreadTime.getMonth() + 1)) + "/" + zeroPad(this.ThreadTime.getDate()) + "(" + jpnDay[this.ThreadTime.getDay()] + ") " + zeroPad(this.ThreadTime.getHours()) + ":" + zeroPad(this.ThreadTime.getMinutes()) + ":" + zeroPad(this.ThreadTime.getSeconds());
+		dontxt += " スレッド作成日時：" + ThrdFormTime + "\n";
+		dontxt += "\n5ch ではスレッド作成日時の UNIX time を 1000 で割った整数部分を dat番号としており、これが被った場合は +1 しています。このため dat番号から作成日時を逆算すると、ミリ秒部分は不明となり実際の秒数とは異なる場合があります。\n";
+		dontxt += "\n";
+		function zeroPad(num) {
+			if (Number(num) < 10)
+				return ("0" + String(num));
+			return (num);
+		};
+
 		// SETTING.TXT
 		/// Other settings
-		var dontxt = "●掲示板設定 (SETTING.TXT)\n";
-		/* EXCEPT BBS_TITLE, BBS_TITLE_ORIG and BBS_NONAME_NAME
-		if (this.Title)
-				dontxt += " 板名：" + this.Title;
-			if (this.TitleOrig)
-				dontxt += " (" + this.TitleOrig + ")";
-			dontxt += "\n";
+		dontxt += "●掲示板設定 (SETTING.TXT)\n";
+		if (this.TitleOrig)
+			dontxt += " 板名：" + this.TitleOrig;
+		else if (this.Title)
+			dontxt += " 板名：" + this.Title;
+		dontxt += "\n";
 		if (this.NoName)
 			dontxt += " デフォルト名無し："  + this.NoName + "\n";
-		*/
 		if (this.NameLen)
-			dontxt += " 名前最大バイト数：" + this.NameLen + "\n";
+			dontxt += " 名前欄最大バイト数：" + this.NameLen + " KB\n";
 		if (this.MailLen)
-			dontxt += " メール最大バイト数：" + this.MailLen + "\n";
+			dontxt += " メール欄最大バイト数：" + this.MailLen + " KB\n";
 		if (this.MaxRows)
-			dontxt += " 最大行数：" + this.MaxRows + "\n";
+			dontxt += " 本文最大行数：" + this.MaxRows + " 行\n";
 		if (this.ResSize)
-			dontxt += " 本文最大バイト数：" + this.ResSize + "\n";
-		if (this.SLIP)
-			dontxt += " SLIP：" + this.SLIP + "\n";
+			dontxt += " 本文最大バイト数：" + this.ResSize + " KB\n";
 		if (this.DispIP)
 			dontxt += " 強制 IP addr.表示：" + this.DispIP + "\n";
 		if (this.ForceID)
 			dontxt += " 強制 ID 表示：" + this.ForceID + "\n";
+		if (this.SLIP)
+			dontxt += " SLIP：" + this.SLIP + "\n";
 		if (this.BEID)
 			dontxt += " BEログイン：" + this.BEID + "\n";
 		if (this.NoID)
