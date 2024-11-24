@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.2pre.1
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.2pre.2
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -22,6 +22,8 @@
 //
 //	 JScript）Scripting.FileSystemObjectではUTF-8テキスト文字化けする。ADODB.Streamを使う。 - 晴歩雨描
 //	 https://2ndart.hatenablog.com/entry/2022/08/07/155523
+//	 www2.wbs.ne.jp/~kanegon/doc/code.txt
+//	 http://www2.wbs.ne.jp/~kanegon/doc/code.txt
 //
 //  1st res top 
 //   <>( sssp://img.5ch.net/ico/IMAGE.FILE(BE icon) <br>) !extend:(ID):(SLIP):(Max res. num.):(Max dat size KB):(donguri=x/y)(:) <br>
@@ -30,10 +32,12 @@
 //
 
 // 修正履歴
+//	ver.0.6.2pre.2
+//					 : Added processing SETTING.TXT with ADODB.stream
 //	ver.0.6.2pre.1
 //           : Changed descriptions of SETTING.TXT,
 //	         : 名前最大バイト数 -> 名前欄最大バイト数,  メール最大バイト数 -> メール欄最大バイト数, 最大行数 -> 本文最大行数
-//	         : Added version number display to the dialog window
+//           : Added version number display to the dialog window
 //           : Added stream and file access with ADODB for JaneXeno's local setting.txt file
 //           : Added BBS_TITLE, BBS_TITLE_ORIG and BBS_NONAME_NAME
 //           : Added thread URL information
@@ -56,7 +60,7 @@
 
 var DispDonguriInfo = {
 	// version number of getdonguri.js
-	Version: "0.6.2pre.1",
+	Version: "0.6.2pre.2",
 	// Display donguri informations
 	Disp: function() {
 		// initalize
@@ -94,31 +98,31 @@ var DispDonguriInfo = {
 	},
 	// Get SETTING.TXT
 	GetSettingTxt: function() {
-		var settingtxt = this.GetLocalSettingTxt();
-		if (settingtxt)
-			this.SettingTxt = settingtxt;
-		else
-			this.SettingTxt = this.Get5chSettingTxt();
-	},
-	// Get a setting.txt file on the JaneXeno's local board folder.
-	GetLocalSettingTxt: function() {
 		var lbpath = this.DatPath.match(/(.+\\)((\d+)\.dat)/);
 		if (lbpath) {
 			var lSettinTxtPath = lbpath[1] + "setting.txt"; // SETTING.TXT on the JaneXeno
 			this.DatFileName = lbpath[2]; // .dat filename
 			this.DatNumber = lbpath[3]; // .dat number (The integer part of UNIX time divided by 1000)
 			this.ThreadTime = new Date(lbpath[3] * 1000); // The date and time the thread was created
-			var strm = new ActiveXObject("ADODB.Stream");
-			strm.Type = 2; // text
-			strm.charset = "shift_jis";
-			strm.Open();
-			strm.LoadFromFile(lSettinTxtPath);
-			var settingTxt = strm.ReadText(-1); // read all
-			strm.Close();
-			//this.Shell.Popup(settingTxt, 0, "setting.txt");
-			return (settingTxt);
 		}
-		return (null);
+		/* var settingtxt = this.GetLocalSettingTxt(lSettinTxtPath);
+		if (settingtxt)
+			this.SettingTxt = settingtxt;
+		else */
+			this.SettingTxt = this.Get5chSettingTxt();
+	},
+	// Get a setting.txt file on the JaneXeno's local board folder.
+	GetLocalSettingTxt: function(lSettinTxtPath) {
+		var strm = new ActiveXObject("ADODB.Stream");
+		strm.Type = 2; // text
+		strm.charset = "shift_jis";
+		strm.Open();
+		strm.LoadFromFile(lSettinTxtPath);
+		var settingTxt = strm.ReadText(-1); // read all
+		strm.Close();
+		//this.Shell.Popup(settingTxt, 0, "setting.txt");
+		return (settingTxt);
+		//return (null);
 	},
 	// Get a SETTING.TXT on the 5ch board resource. Ref. gethtmldat.js
 	Get5chSettingTxt: function() {
@@ -142,11 +146,11 @@ var DispDonguriInfo = {
 		}
 		try {
 			http.open("GET", this.SettingTxtUrl, true);
-			/* The Content-Type header is ineffective for getting SETTING.TXT at least on the 5ch.
-			this.ReqHeaders = {"content-type" : "text/plain; charset=shift_jis"};
+			/*
+			// The Content-Type header is ineffective for getting SETTING.TXT at least on the 5ch.
 			this.UserAgent = "Monazilla/1.00 GetDonguri.Js/" + this.Version + " Windows/10.0.25330";
-			*/
-			/* The Content-Type header is ineffective for getting SETTING.TXT at least on the 5ch.
+			this.ContentType = "text/plain; charset=shift_jis";
+			this.ReqHeaders = {"User-Agent" : this.UserAgent, "content-type" : this.ContentType};
 			for (i in this.ReqHeaders)
 				http.setRequestHeader(i, this.ReqHeaders[i]);
 			*/
@@ -163,27 +167,84 @@ var DispDonguriInfo = {
 		} else {
 			while (http.ReadyState < 4) {}
 		}
-		// The response header(.headers) of SETTING.TXT is empty... So the WinHttp treat strings as us-ascii.
-		var settingTxt = http.ResponseText;
-		/*
+		// The response header(.headers) of SETTING.TXT is empty... So the WinHttp treat strings as Latin-1.
+///*
+		var scrFolder = WScript.ScriptFullName.substring(0,WScript.ScriptFullName.lastIndexOf("\\"));
+		var settingTxtFile = scrFolder + "\\SETTING.TXT"; 
 		// NOooo... THERE IS a setting.txt file encoded with Shift_JIS in the JaneXeno's local board folder.
 		//==========
 		// The ResponseBody is in some mysterious state: Shift_JIS (the original encoding) encoded with UTF-16LE BOM encoding.
 		// Probably because the HTTP communication is without a "content-type" header, the sending site sends it in Shift_JIS,
 		// and the receiving local side processes it as is with UTF-16LE BOM.
 		var buf = http.ResponseBody;
-		var strm = new ActiveXObject("ADODB.Stream");
-		strm.Type = 2; // text
-//		strm.charset = "shift_jis";
-//		strm.charset = "utf-8";
-		strm.charset = "utf-16";
-		strm.Open();
-		strm.WriteText(buf);
-		strm.SaveToFile("SETTING.TXT", 2); // When running via WScript, you need to specify a folder where you have full access permissions.
-		strm.Close();
-		*/
-		return (settingTxt);
+		//var fs = new ActiveXObject("Scripting.FileSystemObject");
+		//var fo = fs.CreateTextFile(settingTxtFile, true, false);
+		//fo.Write(buf);
+		//fo.Close();
+		var stm = new ActiveXObject("ADODB.Stream");
+		stm.Type = 1; // adTypeBinary
+		stm.Open();
+		stm.Write(buf);
+		stm.Position = 2; // Skip BOM(FF FE), top of the ResponseText(encoded with UTF-16)
+		stm.SaveToFile(settingTxtFile, 2); // over write
+		//stm.Close();
+		//stm = new ActiveXObject("ADODB.Stream");
+		stm.Type = 2; // adTypeText
+		stm.Charset = "shift_jis";
+		//stm.Open();
+		stm.LoadFromFile(settingTxtFile);
+		var retval = stm.ReadText();
+		stm.Close();
+		return(retval);
 	},
+//*/
+//		return(http.ResponseText);
+/*
+		// Ref. www2.wbs.ne.jp/~kanegon/doc/code.txt http://www2.wbs.ne.jp/~kanegon/doc/code.txt
+		return(ResTextToText(http.ResponseText, "shift_jis"));
+		function ResTextToText(buffer, charset) {
+			var scrFolder = WScript.ScriptFullName.substring(0,WScript.ScriptFullName.lastIndexOf("\\"));
+			var settingTxtFile = scrFolder + "\\SETTING.TXT"; 
+			var stm = new ActiveXObject("ADODB.Stream");
+			stm.Type = 2; // adTypeText
+			stm.Charset = "utf-16";
+			stm.Open();
+			stm.WriteText(buffer);
+			stm.SaveToFile(settingTxtFile, 2);
+			stm.Close();
+			return buffer;
+*/
+/*
+			var stm = new ActiveXObject("ADODB.Stream");
+			stm.Type = 2; // adTypeText
+			stm.Charset = charset;
+			stm.Open();
+			stm.LoadFromFile(settingTxtFile);
+			stm.Position = 2; // Skip BOM(FF FE), top of the ResponseText(encoded UTF-16)
+			var retval = stm.ReadText();
+			stm.Close();
+			return retval;
+		};
+*/
+/*
+		var tmp = http.ResponseText;
+		return(SJisToText(tmp));
+		function SJisToText(SJisText) {
+			var scrFolder = WScript.ScriptFullName.substring(0,WScript.ScriptFullName.lastIndexOf("\\"));
+			var tmpFile = scrFolder + "\\SETTING.TXT"; 
+			var fs = new ActiveXObject("Scripting.FileSystemObject");
+			//var tmp = fs.OpenTextFile(tmpFile, 2, true, 0); // Open file  for write with ASCII encoding
+			var tmp = fs.CreateTextFile(tmpFile, true, false);
+			DispDonguriInfo.ErrMsg = SJisText;
+			DispDonguriInfo.DispErr();
+			tmp.Write(SJisText);
+			tmp.close();
+			tmp = fs.OpenTextFile(tmpFile, 1, true, 2); // Open file for read with system default(Shift_JIS) encoding
+			var text = tmp.ReadAll();
+			tmp.Close();
+			return(text);
+		};
+*/
 	// Parse SETTING.TXT
 	ParseSettingTxt: function() {
 		// Donguri
