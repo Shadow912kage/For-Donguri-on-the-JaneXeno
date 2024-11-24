@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.2
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.2.1
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,7 @@
 //
 
 // 修正履歴
+//	ver.0.6.2.1: Corrected unit of BBS_NAME_COUNT, BBS_MAIL_COUNT and BBS_MESSAGE_COUNT on the window (KB -> Bytes)
 //	ver.0.6.2: Cleaned up source code
 //	ver.0.6.2pre.2
 //					 : Added processing SETTING.TXT with ADODB.stream
@@ -61,7 +62,7 @@
 
 var DispDonguriInfo = {
 	// version number of getdonguri.js
-	Version: "0.6.2",
+	Version: "0.6.2.1",
 	// Display donguri informations
 	Disp: function() {
 		// initalize
@@ -305,13 +306,13 @@ var DispDonguriInfo = {
 		if (this.NoName)
 			dontxt += " デフォルト名無し："  + this.NoName + "\n";
 		if (this.NameLen)
-			dontxt += " 名前欄最大バイト数：" + this.NameLen + " KB\n";
+			dontxt += " 名前欄最大バイト数：" + this.NameLen + "  Bytes\n";
 		if (this.MailLen)
-			dontxt += " メール欄最大バイト数：" + this.MailLen + " KB\n";
+			dontxt += " メール欄最大バイト数：" + this.MailLen + "  Bytes\n";
 		if (this.MaxRows)
 			dontxt += " 本文最大行数：" + this.MaxRows + " 行\n";
 		if (this.ResSize)
-			dontxt += " 本文最大バイト数：" + this.ResSize + " KB\n";
+			dontxt += " 本文最大バイト数：" + this.ResSize + "  Bytes\n";
 		if (this.DispIP)
 			dontxt += " 強制 IP addr.表示：" + this.DispIP + "\n";
 		if (this.ForceID)
