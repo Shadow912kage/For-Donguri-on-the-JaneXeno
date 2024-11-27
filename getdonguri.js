@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.2.1
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.3pre.1
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,7 @@
 //
 
 // 修正履歴
+//	ver.0.6.3pre.1: Be more simple for the function ParseSettingTxt() using a hashtable
 //	ver.0.6.2.1: Corrected unit of BBS_NAME_COUNT, BBS_MAIL_COUNT and BBS_MESSAGE_COUNT on the window (KB -> Bytes)
 //	ver.0.6.2: Cleaned up source code
 //	ver.0.6.2pre.2
@@ -62,7 +63,7 @@
 
 var DispDonguriInfo = {
 	// version number of getdonguri.js
-	Version: "0.6.2.1",
+	Version: "0.6.3pre.1",
 	// Display donguri informations
 	Disp: function() {
 		// initalize
@@ -195,57 +196,45 @@ var DispDonguriInfo = {
 	},
 	// Parse SETTING.TXT
 	ParseSettingTxt: function() {
-		// Donguri
-		var acorn = this.SettingTxt.match(/BBS_ACORN=(\d)/);
-		var vipq2 = this.SettingTxt.match(/BBS_USE_VIPQ2=(\d+)/);
-		if (acorn)
-			this.Acorn = acorn[1];
-		if (vipq2)
-			this.VipQ2 = vipq2[1];
-
-		// Other board settings
-		var title1 = this.SettingTxt.match(/BBS_TITLE=(.+)([@＠][25]ch掲示板)/);
-		var title3 = this.SettingTxt.match(/BBS_TITLE=(.+)/);
-		if (title1) {
-			this.Title = title1[1];
-			var title2 = title1[1].match(/(.+)((\(|（)仮(\)|）))/);
-			if (title2)
-				this.Title = title2[1];
-		} else if (title3)
-			this.Title = title3[1];
-		var titleorig = this.SettingTxt.match(/BBS_TITLE_ORIG=(.+)/);
-		if (titleorig)
-			this.TitleOrig = titleorig[1];
-		var noname = this.SettingTxt.match(/BBS_NONAME_NAME=(.+)/);
-		if (noname)
-			this.NoName = noname[1];
-		var maxrows = this.SettingTxt.match(/BBS_LINE_NUMBER=(\d+)/);
-		if (maxrows)
-			this.MaxRows = parseInt(maxrows[1]) * 2;
-		var namelen = this.SettingTxt.match(/BBS_NAME_COUNT=(\d+)/);
-		if (namelen)
-			this.NameLen = namelen[1];
-		var maillen = this.SettingTxt.match(/BBS_MAIL_COUNT=(\d+)/);
-		if (maillen)
-			this.MailLen = maillen[1];
-		var ressize = this.SettingTxt.match(/BBS_MESSAGE_COUNT=(\d+)/);
-		if (ressize)
-			this.ResSize = ressize[1];
-		var slip = this.SettingTxt.match(/BBS_SLIP=(.+)/);
-		if (slip)
-			this.SLIP = slip[1];
-		var dispip = this.SettingTxt.match(/BBS_DISP_IP=(.+)/);
-		if (dispip)
-			this.DispIP = dispip[1];
-		var forceid = this.SettingTxt.match(/BBS_FORCE_ID=(.+)/);
-		if (forceid)
-			this.ForceID = forceid[1];
-		var beid = this.SettingTxt.match(/BBS_BE_ID=(\d)/);
-		if (beid)
-			this.BEID = beid[1];
-		var noid = this.SettingTxt.match(/BBS_NO_ID=(.+)/);
-		if (noid)
-			this.NoID = noid[1];
+		// The hashtable between DispDonguriInfo's property and its regex pattern for searching SETTING.TXT hashtable 
+		var propNameRegExTbl = {
+			// Donguri
+			'Acorn' : /BBS_ACORN=(\d)/,
+			'VipQ2' : /BBS_USE_VIPQ2=(\d+)/,
+			// Other board settings
+			'title1' : /BBS_TITLE=(.+)([@＠][25]ch掲示板)/,
+			'title3' : /BBS_TITLE=(.+)/,
+			'TitleOrig' : /BBS_TITLE_ORIG=(.+)/,
+			'NoName' : /BBS_NONAME_NAME=(.+)/,
+			'MaxRows' : /BBS_LINE_NUMBER=(\d+)/,
+			'NameLen' : /BBS_NAME_COUNT=(\d+)/,
+			'MailLen' : /BBS_MAIL_COUNT=(\d+)/,
+			'ResSize' : /BBS_MESSAGE_COUNT=(\d+)/,
+			'SLIP' : /BBS_SLIP=(.+)/,
+			'DispIP' : /BBS_DISP_IP=(.+)/,
+			'ForceID' : /BBS_FORCE_ID=(.+)/,
+			'BEID' : /BBS_BE_ID=(\d)/,
+			'NoID' : /BBS_NO_ID=(.+)/
+		};
+		for (propName in propNameRegExTbl) {
+			var hit = this.SettingTxt.match(propNameRegExTbl[propName]);
+			if (hit) {
+				switch (propName) {
+					case 'title1':
+						this.Title = hit[1];
+						var title2 = hit[1].match(/(.+)((\(|（)仮(\)|）))/);
+						if (title2)
+							this.Title = title2[1];
+						break;
+					case 'title3':
+						if (!this.Title)
+							this.Title = hit[1];
+						break;
+					default:
+						this[propName] = hit[1];
+				}
+			}
+		}
 	},
 	// Get 1st res. of local dat and parse it
 	GetDatDonguri: function() {
