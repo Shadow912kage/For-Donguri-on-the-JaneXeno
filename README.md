@@ -22,6 +22,8 @@ JaneXeno の ツール(O) > 設定(O)... > 機能 > コマンド で以下のよ
 　　 Script というフォルダに getdonguri.js というファイル名で置いた場合)
 =====
 ```
+## その他
+「JaneXeno 用の」と銘打っていますが、Jane系の専用ブラウザなら一応使えるようです。ただし当方では JaneXeno 以外での動作確認はいたしませんし、今後する予定もありませんのであしからず。「こう変更すれば～でも動作します」といったパッチは大歓迎です。
 
 ## References:
 -[SETTING.TXT - ５ちゃんねるwiki](https://info.5ch.net/index.php/SETTING.TXT)<br>
