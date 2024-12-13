@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.3
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.4
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,7 @@
 //
 
 // 修正履歴
+//	ver.0.6.4: Corrected regex begin/last part of !extend: command, [SPC] -> \s+.
 //	ver.0.6.3: Added a User-Agent header to the HTTP request header
 //           : Added an ETag value to the HTTP request "If-Not-Modified" header and check returned HTTP status
 //           : Added caching an ETag value and the SETTING.TXT to EtagSettingTxt.Cache\<server name>.<board name>.txt file
@@ -67,7 +68,7 @@
 
 var DispDonguriInfo = {
 	// version number of getdonguri.js
-	Version: "0.6.3",
+	Version: "0.6.4",
 	// Flag to use local setting.txt of JaneXeno or not (false or true)
 	useLocalSettingTxt: false,
 //	useLocalSettingTxt: true,
@@ -301,7 +302,7 @@ var DispDonguriInfo = {
 		var dat = fs.OpenTextFile(this.DatPath, 1, 0);
 		var dat1st = dat.ReadLine();
 		dat.Close();
-		var dngrtop = dat1st.match(/<>( sssp:\/\/img\.5ch\.net\/ico\/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)? !extend:(.*?):(.*?):(\d+)?:(\d+)?(:donguri=(\d+)\/(\d))?:{0,2} <br>/);
+		var dngrtop = dat1st.match(/<>( sssp:\/\/img\.5ch\.net\/ico\/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?\s+!extend:(.*?):(.*?):(\d+)?:(\d+)?(:donguri=(\d+)\/(\d))?:{0,2}\s+<br>/);
 		var dngrbtm = dat1st.match(/<hr>VIPQ2_EXTDAT: (.+?):(.+?):(\d+):(\d+):(donguri=(\d+)\/(\d))?: EXT was configured <>/);
 		if (dngrtop) {
 			this.Id = dngrtop[2];
