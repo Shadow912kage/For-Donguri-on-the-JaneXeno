@@ -6,7 +6,7 @@ ReplaceStrDonguri.txt と getdonguri.js は独立した存在ですので、そ�
 ## ReplaceStr.txt
 JaneXeno をインストールしているフォルダ下の ReplaceStr.txt へ ReplaceStrDonguri.txt の内容を追加してください(要、JaneXeno 再起動)。
 
-## Script
+## getdonguri.js
 JaneXeno をインストールしているフォルダ下のスクリプトを置いているフォルダへ getdonguri.js を置いてください(以下は Script フォルダに置いたものとして説明します)。
 ```
 ***** 注意 *****
@@ -21,6 +21,16 @@ JaneXeno の ツール(O) > 設定(O)... > 機能 > コマンド で以下のよ
 　　(2つ目のパラーメータは、JaneXeno をインストールしたフォルダ下の
 　　 Script というフォルダに getdonguri.js というファイル名で置いた場合)
 =====
+```
+## Exaxxion.js
+どんぐり大砲用のスクリプトです。ハンターでないと大砲は撃てません。
+```
+JaneXeno の ツール(O) > 設定(O)... > 機能 > コマンド で以下のように設定
+　コマンド名： +どんぐり大砲
+　　(先頭に「+」を付けた任意の文字列、レス番メニューのみに表示)
+　実行するコマンド： wscript "$BASEPATHScript/Exaxxion.js" "$URL" "$LOCALDAT" $NUMBER
+　　(2つ目のパラーメータは、JaneXeno をインストールしたフォルダ下の
+　　 Script というフォルダに Exaxxion.js というファイル名で置いた場合)
 ```
 ## その他
 「JaneXeno 用の」と銘打っていますが、Jane系の専用ブラウザなら一応使えるようです。ただし当方では JaneXeno 以外での動作確認はいたしませんし、今後する予定もありませんのであしからず。「こう変更すれば～でも動作します」といったパッチは大歓迎です。
