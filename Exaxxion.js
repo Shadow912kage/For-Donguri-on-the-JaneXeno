@@ -14,9 +14,9 @@
 //		0.1: Initial release
 
 /* References
-	ã©ã‚“ãã‚Šã‚·ã‚¹ãƒ†ãƒ 
+	‚Ç‚ñ‚®‚èƒVƒXƒeƒ€
 	https://donguri.5ch.net/cannon
-	ã©ã‚“ãã‚Šå¤§ç ² API
+	‚Ç‚ñ‚®‚è‘å–C API
 	https://donguri.5ch.net/api
 	https://donguri.5ch.net/confirm?url=<url encoded "thread URL">&date=<url encoded "res JPN style date time">
 */
@@ -31,7 +31,7 @@ var Exaxxion = {
 		this.confirmedFire();
 	},
 	initialize: function () {
-		this.WinTitle = "ã©ã‚“ãã‚Šå¤§ç ² (" + WScript.ScriptName + " ver." + this.version + ")";
+		this.WinTitle = "‚Ç‚ñ‚®‚è‘å–C (" + WScript.ScriptName + " ver." + this.version + ")";
 		this.Shell = WScript.CreateObject("WScript.Shell"); // this.Shell.Run(URL);
 		var acornBase = "https://donguri.5ch.net";
 		var commands = {
@@ -55,7 +55,7 @@ var Exaxxion = {
 		if (urls) {
 			this.encodedUrl = encodeURIComponent(this.ThreadUrl);
 		} else {
-			this.Shell.Popup("5ã¡ã‚ƒã‚“ã­ã‚‹ã®æ²ç¤ºæ¿ã§ã¯ã‚ã‚Šã¾ã›ã‚“", 0, this.WinTitle);
+			this.Shell.Popup("5‚¿‚á‚ñ‚Ë‚é‚ÌŒf¦”Â‚Å‚Í‚ ‚è‚Ü‚¹‚ñ", 0, this.WinTitle);
 			WScript.Quit();
 		}
 	},
@@ -76,12 +76,12 @@ var Exaxxion = {
 			// Check whether to be able to fire the Acorn cannon or not on the thread.
 			if ((i == 0) && !this.isAbleToFire(res)) {
 				dat.Close();
-				this.Shell.Popup("ã“ã®ã‚¹ãƒ¬ãƒƒãƒ‰ã§ã¯å¤§ç ²ã‚’æ’ƒã¦ã¾ã›ã‚“", 0, this.WinTitle);
+				this.Shell.Popup("‚±‚ÌƒXƒŒƒbƒh‚Å‚Í‘å–C‚ğŒ‚‚Ä‚Ü‚¹‚ñ", 0, this.WinTitle);
 				WScript.Quit();
 			}
 		}
 		dat.Close();
-		var dateid = res.match(/<>(\d{4}\/\d{2}\/\d{2}\([æ—¥æœˆç«æ°´æœ¨é‡‘åœŸ]\) \d{2}:\d{2}:\d{2}\.\d{2})(?: (?:(ID:[-+/0-9A-Za-z]+)â—?)?)?(?: .)?( BE:[^<>]+)?<>/);
+		var dateid = res.match(/<>(\d{4}\/\d{2}\/\d{2}\([“úŒ‰Î…–Ø‹à“y]\) \d{2}:\d{2}:\d{2}\.\d{2})(?: (?:(ID:[-+/0-9A-Za-z]+)œ?)?)?(?: .)?( BE:[^<>]+)?<>/);
 		if (dateid) {
 			this.targetDate = dateid[1];
 			this.encodedDate = encodeURIComponent(dateid[1]).replace("(", "%28").replace(")", "%29").replace("%20", "+");
@@ -89,8 +89,8 @@ var Exaxxion = {
 		}
 	},
 	confirmedFire: function () {
-		var msg = "ã‚¹ãƒ¬ãƒƒãƒ‰ï¼š" + this.ThreadUrl + "\nãƒ¬ã‚¹ç•ªï¼š" + this.ResNum + "\næŠ•ç¨¿æ—¥ï¼š"
-		+ this.targetDate + "\nIDï¼š" + this.targetID + "\n\nã«ã€ã©ã‚“ãã‚Šå¤§ç ²ã‚’æ’ƒã¡ã¾ã™ã‹ï¼Ÿ";
+		var msg = "ƒXƒŒƒbƒhF" + this.ThreadUrl + "\nƒŒƒX”ÔF" + this.ResNum + "\n“Še“úF"
+		+ this.targetDate + "\nIDF" + this.targetID + "\n\n‚ÉA‚Ç‚ñ‚®‚è‘å–C‚ğŒ‚‚¿‚Ü‚·‚©H";
 		var url = this.acornUrlPrams.SchemeHost + this.acornUrlPrams.Path.confirm
 			+ "?" + this.acornUrlPrams.Query.threadUrl + "=" + this.encodedUrl
 			+ "&" + this.acornUrlPrams.Query.targetDate + "=" + this.encodedDate;
@@ -102,7 +102,7 @@ var Exaxxion = {
 var args = WScript.Arguments;
 if (args.length < 3) { // Arguments check
 	var thisname = WScript.ScriptName;
-	var message = "å¼•æ•°ã®æ•°ãŒè¶³ã‚Šã¾ã›ã‚“ï¼\n\nä½¿ç”¨æ³•ï¼š\n " + thisname + " 5chã®ã‚¹ãƒ¬ãƒƒãƒ‰ã®URL DATãƒ•ã‚¡ã‚¤ãƒ«å ãƒ¬ã‚¹ç•ªå·\n\nJaneXeno ã®ã‚³ãƒãƒ³ãƒ‰è¨­å®šä¾‹ï¼š\n" + "ã€€+(ã‚³ãƒãƒ³ãƒ‰åã®ä»»æ„ã®æ–‡å­—åˆ—)\n wscript \"$BASEPATHScript/" + thisname + "\" \"$URL\" \"$LOCALDAT\" $NUMBER";
+	var message = "ˆø”‚Ì”‚ª‘«‚è‚Ü‚¹‚ñI\n\ng—p–@F\n " + thisname + " 5ch‚ÌƒXƒŒƒbƒh‚ÌURL DATƒtƒ@ƒCƒ‹–¼ ƒŒƒX”Ô†\n\nJaneXeno ‚ÌƒRƒ}ƒ“ƒhİ’è—áF\n" + "@+(ƒRƒ}ƒ“ƒh–¼‚Ì”CˆÓ‚Ì•¶š—ñ)\n wscript \"$BASEPATHScript/" + thisname + "\" \"$URL\" \"$LOCALDAT\" $NUMBER";
 	WScript.Echo(message);
 	WScript.Quit();
 }
