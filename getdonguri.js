@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.4
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.5pre.1
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,7 @@
 //
 
 // 修正履歴
+//	ver.0.6.5pre.1: Rewritten HTTP setup and process code
 //	ver.0.6.4: Corrected regex begin/last part of !extend: command, [SPC] -> \s+.
 //	ver.0.6.3: Added a User-Agent header to the HTTP request header
 //           : Added an ETag value to the HTTP request "If-Not-Modified" header and check returned HTTP status
@@ -68,7 +69,7 @@
 
 var DispDonguriInfo = {
 	// version number of getdonguri.js
-	Version: "0.6.4",
+	Version: "0.6.5pre.1",
 	// Flag to use local setting.txt of JaneXeno or not (false or true)
 	useLocalSettingTxt: false,
 //	useLocalSettingTxt: true,
@@ -78,6 +79,8 @@ var DispDonguriInfo = {
 		// initalize
 		this.Init();
 		// display dialog window
+		this.GetBBSMenuJson();
+		this.ParseBBSMenuJson();
 		this.GetSettingTxt();
 		this.ParseSettingTxt();
 		this.GetDatDonguri();
@@ -91,7 +94,8 @@ var DispDonguriInfo = {
 		this.UserAgent = "Monazilla/1.00 GetDonguri.Js/" + this.Version + " Windows/" + this.WinVersion;
 		this.Shell = new ActiveXObject("WScript.Shell");
 		this.ErrMsg = null;
-		this.ParseUrl();
+		this.SetupHttpReq();
+		this.ParseBoardUrl();
 		this.CreateCacheFolder();
 	},
 	// ref. windows - Find OS Name/Version using JScript - Stack Overflow
@@ -101,8 +105,58 @@ var DispDonguriInfo = {
 		var enumItems = new Enumerator(objWMISrvc.ExecQuery("Select * From Win32_OperatingSystem"));
 		var sys = enumItems.item();
 		this.WinVersion = sys.Version;
-	},		
-	ParseUrl:	function() {
+	},
+	SetupHttpReq: function() {
+		// ref. XMLHttpRequest を作成する (mixi 日記アーカイブ)
+		//      https://loafer.jp/mixi/diary/class.xsp?2006-07-20-22-26
+		var httpProgIdWinHttpTbl = [
+		{ProgID: "WinHttp.WinHttpRequest.5.1", WinHttp: true}, // XP, 2K Pro SP3, Server 2003, 2K server SP3 or later
+		{ProgID: "Msxml2.ServerXMLHTTP.6.0", WinHttp: true},   // unknown
+		{ProgID: "Msxml2.ServerXMLHTTP.3.0",WinHttp: true},		 // unknown
+		{ProgID: "Msxml2.XMLHTTP.6.0", WinHttp: false},    		 // unknown
+		{ProgID: "Msxml2.XMLHTTP.3.0", WinHttp: false}    		 // unknown
+		];
+		for (i = 0; i < httpProgIdWinHttpTbl.length; i++) {
+			try {
+				this.httpReq = new ActiveXObject(httpProgIdWinHttpTbl[i].ProgID);
+				this.useWinHttp = httpProgIdWinHttpTbl[i].WinHttp;
+				break;
+			} catch (e) {
+				if (httpProgIdWinHttpTbl.length == i + 1)
+					throw e;
+			}
+		}
+		var TIME_OUT = 3000; // 3000 msec
+		if (this.useWinHttp) {
+			this.httpReq.SetTimeouts(TIME_OUT, TIME_OUT, TIME_OUT, TIME_OUT);
+		} else {
+			this.httpReq.timeout = TIME_OUT;
+			this.httpReq.ontimeout = function() {
+				this.ErrMsg = "サーバーからの応答がありません";
+				this.DispErr();
+			}
+		}
+	},
+	httpReqOnError: function(e, msg) {
+		this.ErrMsg = msg + "\n";
+		// ref. スクリプトを使用したデータの取得 - Win32 apps | Microsoft Learn
+		// https://learn.microsoft.com/ja-jp/windows/win32/winhttp/retrieving-data-using-script
+		this.ErrMsg += e + "\n";
+		this.ErrMsg += "WinHTTP returned error: " + (e.number & 0xffff).toString() + "\n\n";
+		this.ErrMsg += e.description;
+		this.DispErr();
+	},
+	httpReqWaitForResponse: function() {
+		if (this.useWinHttp) {
+			if (!this.httpReq.WaitForResponse()) {
+				this.ErrMsg = "サーバーからの応答がありません";
+				this.DispErr();
+			}
+		} else {
+			while (this.httpReq.ReadyState < 4) {}
+		}
+	},
+	ParseBoardUrl: function() {
 		var Urls = this.BoardUrl.match(/https:\/\/(([-A-Za-z0-9]+)\.5ch\.net)\/([-A-Za-z0-9]+)\//);
 		if (Urls) {
 			this.ServerFullName = Urls[1]
@@ -126,6 +180,12 @@ var DispDonguriInfo = {
 	DispErr: function() {
 		this.Shell.Popup(this.ErrMsg, 0, "エラー");
 		WScript.Quit();
+	},
+	// Get bbsmenu.json
+	GetBBSMenuJson: function() {
+	},
+	// Parse bbsmenu.json
+	ParseBBSMenuJson: function() {
 	},
 	// Get SETTING.TXT
 	GetSettingTxt: function() {
@@ -180,56 +240,31 @@ var DispDonguriInfo = {
 			strm.Close();
 			var etag = this.SettingTxt.match(/^ETag: (".+")\n/);
 			if (etag)
-				this.ETag = etag[1];
+				this.SettingTxtETag = etag[1];
 		}
 	},
 	// Get a SETTING.TXT on the 5ch board resource. Ref. gethtmldat.js
 	Get5chSettingTxt: function() {
-		var USED_WINHTTP = true;
-		try {http = new ActiveXObject("WinHttp.WinHttpRequest.5.1");} catch (e) {}
-		if (!http) try {http = new ActiveXObject("Msxml2.ServerXMLHTTP.6.0");} catch (e) {}
-		if (!http) try {http = new ActiveXObject("Msxml2.ServerXMLHTTP.3.0");} catch (e) {}
-		if (!http) var USED_WINHTTP = false;
-		if (!http) try {http = new ActiveXObject("Msxml2.XMLHTTP.6.0");} catch (e) {}
-		if (!http) {http  = new ActiveXObject("Msxml2.XMLHTTP.3.0");}
-
-		var TIME_OUT = 3000; // 3000 msec
-		if (USED_WINHTTP) {
-			http.SetTimeouts(TIME_OUT, TIME_OUT, TIME_OUT, TIME_OUT);
-		} else {
-			http.timeout = TIME_OUT;
-			http.ontimeout = function() {
-				this.ErrMsg = "サーバーからの応答がありません";
-				this.DispErr();
-			}
-		}
 		try {
-			http.open("GET", this.SettingTxtUrl, true);
-			http.setRequestHeader("User-Agent", this.UserAgent);
-			if (this.ETag)
-				http.setRequestHeader("If-None-Match", this.ETag);
-			http.send();
+			this.httpReq.open("GET", this.SettingTxtUrl, true);
+			this.httpReq.setRequestHeader("User-Agent", this.UserAgent);
+			if (this.SettingTxtETag)
+				this.httpReq.setRequestHeader("If-None-Match", this.SettingTxtETag);
+			this.httpReq.send();
 		} catch (e) {
-			this.ErrMsg = "SETTING.TXTを取得できませんでした\nエラーコード：" + e;
-			this.DispErr();
+			this.httpReqOnError(e, "SETTING.TXTを取得できませんでした");
 		}
-		if (USED_WINHTTP) {
-			if (!http.WaitForResponse()) {
-				this.ErrMsg = "サーバーからの応答がありません";
-				this.DispErr();
-			}
-		} else {
-			while (http.ReadyState < 4) {}
-		}
-		if (http.Status == "304") // SETTING.TXT is NOT modified
+		this.httpReqWaitForResponse();
+
+		if (this.httpReq.Status == "304") // SETTING.TXT is NOT modified
 			return;
 
-		if (this.ETag) 
+		if (this.SettingTxtETag) 
 			this.WinTitle += " - The SETTING.TXT had been modified!";
 		else
 			this.WinTitle += " - New board";
 
-		this.ETag = http.GetResponseHeader("ETag");
+		this.SettingTxtETag = http.GetResponseHeader("ETag");
 
 		// The WinHttp treat strings as Latin-1 for ResponseText in the Content-Type header w/o charset parameter
 		// NOooo... THERE IS a setting.txt file encoded with Shift_JIS in the JaneXeno's local board folder.
@@ -248,7 +283,7 @@ var DispDonguriInfo = {
 		strm.Type = 2; // adTypeText
 		strm.Charset = "shift_jis";
 		strm.LoadFromFile(this.EtagSettingTxtFile);
-		this.SettingTxt = "ETag: " + this.ETag + "\n" + strm.ReadText(); // Add an ETag value to the top of SETTING.TXT
+		this.SettingTxt = "ETag: " + this.SettingTxtETag + "\n" + strm.ReadText(); // Add an ETag value to the top of SETTING.TXT
 		strm.Position = 0; // Reset writing position
 		strm.WriteText(this.SettingTxt);
 		strm.SaveToFile(this.EtagSettingTxtFile, 2); // over write, ETag value and SETTING.TXT
