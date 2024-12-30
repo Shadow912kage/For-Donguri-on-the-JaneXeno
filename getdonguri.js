@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.5pre.1
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.5
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,8 @@
 //
 
 // 修正履歴
+//	ver.0.6.5: Added getting & processing a https://menu.5ch.net/bbsmenu.json
+//	ver.0.6.5pre.2: test code...
 //	ver.0.6.5pre.1: Rewritten HTTP setup and process code
 //	ver.0.6.4: Corrected regex begin/last part of !extend: command, [SPC] -> \s+.
 //	ver.0.6.3: Added a User-Agent header to the HTTP request header
@@ -69,7 +71,12 @@
 
 var DispDonguriInfo = {
 	// version number of getdonguri.js
-	Version: "0.6.5pre.1",
+	Version: "0.6.5",
+
+	// Script configurations
+	// bbsmenu.json cache expiration [sec]
+	bbsMenuCacheExprtn: 43200, // 43200 sec = 12 hours
+//	bbsMenuCacheExprtn: 86400, // 86400 sec = 24 hours
 	// Flag to use local setting.txt of JaneXeno or not (false or true)
 	useLocalSettingTxt: false,
 //	useLocalSettingTxt: true,
@@ -79,6 +86,8 @@ var DispDonguriInfo = {
 		// initalize
 		this.Init();
 		// display dialog window
+		//this.GetBbsMenuJsonCache();
+		this.GetLastModifyMngmntBrdsCache();
 		this.GetBBSMenuJson();
 		this.ParseBBSMenuJson();
 		this.GetSettingTxt();
@@ -97,6 +106,9 @@ var DispDonguriInfo = {
 		this.SetupHttpReq();
 		this.ParseBoardUrl();
 		this.CreateCacheFolder();
+		this.bbsMenuCacheExpired = false;
+		this.bbsMenuJsonLastModify = 0;
+		this.mngmntBoards = [];
 	},
 	// ref. windows - Find OS Name/Version using JScript - Stack Overflow
 	//      https://stackoverflow.com/questions/351282/find-os-name-version-using-jscript
@@ -163,6 +175,8 @@ var DispDonguriInfo = {
 			this.ServerName = Urls[2];
 			this.BoardName = Urls[3];
 			this.SettingTxtUrl = this.BoardUrl + "SETTING.TXT";
+			this.BbsMenuJsonUrl = "https://menu.5ch.net/bbsmenu.json";
+			//this.BbsMenuHtmlUrl = "https://menu.5ch.net/bbsmenu.html";
 		} else {
 			this.ErrMsg = "5ちゃんねるの掲示板ではありません";
 			this.DispErr();
@@ -175,17 +189,121 @@ var DispDonguriInfo = {
 		if (!fs.FolderExists(cacheFolder))
 			fs.CreateFolder(cacheFolder);
 		this.EtagSettingTxtFile = cacheFolder + "\\" + this.ServerName + "." + this.BoardName + ".txt";
+		this.BbsMenuJsonFile = cacheFolder + "\\" + "bbsmenu.json";
+		this.LstModMngmntBrdsFile = cacheFolder + "\\" + "lastmod-mngmntbrds.txt";
 	},
 	// Display error message & quit process
 	DispErr: function() {
 		this.Shell.Popup(this.ErrMsg, 0, "エラー");
 		WScript.Quit();
 	},
+	// Get the bbsmenu.json cache and the last modified date and time (Unixtime [sec])
+	GetBbsMenuJsonCache: function() {
+		var fs = WScript.CreateObject("Scripting.FileSystemObject");
+		if (fs.FileExists(this.BbsMenuJsonFile)) {
+			var strm = new ActiveXObject("ADODB.Stream");
+			strm.Type = 2; // text
+			strm.charset = "utf-8"; // UTF-8 BOM
+			strm.Open();
+			strm.LoadFromFile(this.BbsMenuJsonFile);
+			this.BbsMenuJson = strm.ReadText();
+			strm.Close();
+			// parse bbsmenu.json, get "last_modify" value
+			/* NOT implemented "JSON" on the JScript...
+			var bbsMenuJsObj = JSON.parse(this.BbsMenuJson);
+			this.bbsMenuJsonLastModify = bbsMenuJsObj.last_modify;
+			for (propName in this.BbsMenuJson)
+				if (propName == '"last_modify"')
+					this.bbsMenuJsonLastModify = this.BbsMenuJson[propName];
+			*/
+			var lstmod = this.BbsMenuJson.match(/"last_modify":\s*(\d{10}),?/);
+			if (lstmod)
+				this.bbsMenuJsonLastModify = lstmod[1];
+		}
+	},
+	// Get last_modify and board URLs to the cache file
+	GetLastModifyMngmntBrdsCache: function() {
+		var fs = new ActiveXObject("Scripting.FileSystemObject");
+		if (fs.FileExists(this.LstModMngmntBrdsFile)) {
+			var ts = fs.OpenTextFile(this.LstModMngmntBrdsFile, 1, 0);
+			this.bbsMenuJsonLastModify = ts.ReadLine();
+			for (var i = 0; !ts.AtEndOfStream; i++)
+				this.mngmntBoards[i] = ts.ReadLine();
+			ts.Close();
+		}
+	},
 	// Get bbsmenu.json
 	GetBBSMenuJson: function() {
+		// bbsmenu.html's ETag checking...? instead of json's last_modify...
+		// bbsmenu.html is created from bbsmenu.json every day, maybe...
+		var date = new Date();
+		var unixtimeNow = date.getTime() / 1000; // Date.getTime() unit is msec
+		if ((unixtimeNow - this.bbsMenuJsonLastModify) > this.bbsMenuCacheExprtn)
+			this.bbsMenuCacheExpired = true;
+		if (this.mngmntBoards && !this.bbsMenuCacheExpired)
+			return;
+
+		try {
+			this.httpReq.open("GET", this.BbsMenuJsonUrl, true);
+			this.httpReq.setRequestHeader("User-Agent", this.UserAgent);
+			this.httpReq.send();
+		} catch (e) {
+			this.httpReqOnError(e, this.BbsMenuJsonUrl + "を取得できませんでした");
+		}
+		this.httpReqWaitForResponse();
+
+		var strm = new ActiveXObject("ADODB.Stream");
+		strm.Type = 1; // adTypeBinary
+		strm.Open();
+		strm.Write(this.httpReq.ResponseBody);
+		strm.SaveToFile(this.BbsMenuJsonFile, 2); // over write
+		strm.Type = 2; // adTypeText
+		strm.Charset = "utf-8"; // UTF-8 BOM
+		strm.LoadFromFile(this.BbsMenuJsonFile);
+		this.BbsMenuJson = strm.ReadText();
+		strm.Position = 0; // Reset writing position
+		strm.WriteText(this.BbsMenuJson);
+		strm.SaveToFile(this.BbsMenuJsonFile, 2); // over write
+		strm.Close();
 	},
 	// Parse bbsmenu.json
 	ParseBBSMenuJson: function() {
+		if (!this.bbsMenuCacheExpired)
+			return;
+		// get the "last_modify" value from bbsmenu.json
+		var lstmod = this.BbsMenuJson.match(/"last_modify":\s*(\d{10}),?/);
+		if (lstmod)
+			this.bbsMenuJsonLastModify = lstmod[1];
+		// find out the boards dealing with deletion and management
+		var mngmntBoardsBlk = this.BbsMenuJson.match(/"category_content":\s*\[(,?{([^{,]+,)*?"category_name":\s*"運営"(,[^,}]+)*?})+\]/);
+		if (mngmntBoardsBlk) {
+			var urlSects = mngmntBoardsBlk[0].match(/"url":\s*"([^"]+)"/g);
+			if (urlSects) {
+				for (var i = 0; i < urlSects.length; i++) {
+					var board = urlSects[i].match(/"url":\s*"([^"]+)"/);
+					if (board)
+						this.mngmntBoards[i] = board[1];
+				}
+			}
+		}
+		// write last_modify and board URLs to the cache file
+		var fs = new ActiveXObject("Scripting.FileSystemObject");
+		if (fs.FileExists(this.LstModMngmntBrdsFile))
+			var ts = fs.OpenTextFile(this.LstModMngmntBrdsFile, 2, 0);
+		else
+			var ts = fs.CreateTextFile(this.LstModMngmntBrdsFile);
+		ts.WriteLine(this.bbsMenuJsonLastModify);
+		for (var i = 0; i < this.mngmntBoards.length; i++)
+			ts.WriteLine(this.mngmntBoards[i]);
+		ts.Close();
+	},
+	// Whether the specified board is dealing with management or not
+	isMngmntBorad: function(board) {
+		for (var i = 0; i < this.mngmntBoards.length; i++) {
+			if (this.mngmntBoards[i] == board)
+				return true;
+		}
+		return false;
 	},
 	// Get SETTING.TXT
 	GetSettingTxt: function() {
@@ -243,7 +361,7 @@ var DispDonguriInfo = {
 				this.SettingTxtETag = etag[1];
 		}
 	},
-	// Get a SETTING.TXT on the 5ch board resource. Ref. gethtmldat.js
+	// Get a SETTING.TXT on the 5ch board resource.
 	Get5chSettingTxt: function() {
 		try {
 			this.httpReq.open("GET", this.SettingTxtUrl, true);
@@ -252,7 +370,7 @@ var DispDonguriInfo = {
 				this.httpReq.setRequestHeader("If-None-Match", this.SettingTxtETag);
 			this.httpReq.send();
 		} catch (e) {
-			this.httpReqOnError(e, "SETTING.TXTを取得できませんでした");
+			this.httpReqOnError(e, this.SettingTxtUrl + "を取得できませんでした");
 		}
 		this.httpReqWaitForResponse();
 
@@ -264,7 +382,7 @@ var DispDonguriInfo = {
 		else
 			this.WinTitle += " - New board";
 
-		this.SettingTxtETag = http.GetResponseHeader("ETag");
+		this.SettingTxtETag = this.httpReq.GetResponseHeader("ETag");
 
 		// The WinHttp treat strings as Latin-1 for ResponseText in the Content-Type header w/o charset parameter
 		// NOooo... THERE IS a setting.txt file encoded with Shift_JIS in the JaneXeno's local board folder.
@@ -277,7 +395,7 @@ var DispDonguriInfo = {
 		var strm = new ActiveXObject("ADODB.Stream");
 		strm.Type = 1; // adTypeBinary
 		strm.Open();
-		strm.Write(http.ResponseBody);
+		strm.Write(this.httpReq.ResponseBody);
 		strm.Position = 2; // Skip BOM(FF FE), top of the ResponseBody(encoded with UTF-16)
 		strm.SaveToFile(this.EtagSettingTxtFile, 2); // over write, raw SETTING.TXT
 		strm.Type = 2; // adTypeText
@@ -396,7 +514,7 @@ var DispDonguriInfo = {
 		{propName: 'Acorn', ItemName: "BBS_ACORN", ItemDescTbl: acornDescTbl},
 		{propName: 'VipQ2', ItemName: "BBS_USE_VIPQ2", ItemDescTbl: vipq2DescTbl}];
 		var DonguriInfoTbl = [
-		{Heading: "どんぐり関連設定 (SETTING.TXT)", objItems: donguriItems, Notes: null}];
+		{Heading: "どんぐり関連設定 (SETTING.TXT)", objItems: donguriItems, Notes: "運営系以外の板ではBBS_USE_VIPQ2=2が既定値です。"}];
 
 		// Thread information table & object
 		var idDescTbl = {
@@ -496,6 +614,13 @@ var DispDonguriInfo = {
 									this.dInfoTxt += " " + items[j].ItemDescTbl[k + 1] + "\n";
 							} else {
 								this.dInfoTxt += " " + items[j].ItemDescTbl[0] + "\n";
+								// Added the description of the new feature from
+								// http://kes.5ch.net/test/read.cgi/donguri/1734767867/181
+								if (!this._parent.isMngmntBorad(this._parent.BoardUrl)) {
+									var vipq2key = 2;
+									for (var k = 0; k < vipq2key; k++)
+										this.dInfoTxt += " (" + items[j].ItemDescTbl[k + 1] + ")\n";
+								}
 							}
 							break;
 						}
