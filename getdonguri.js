@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.5
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.6pre.1
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,8 @@
 //
 
 // 修正履歴
+//	ver.0.6.6pre.1: Added information if according to SETTING.TXT is modified,
+//								: visit a new board or bbsmenu.json cache is expired
 //	ver.0.6.5: Added getting & processing a https://menu.5ch.net/bbsmenu.json
 //	ver.0.6.5pre.2: test code...
 //	ver.0.6.5pre.1: Rewritten HTTP setup and process code
@@ -71,12 +73,14 @@
 
 var DispDonguriInfo = {
 	// version number of getdonguri.js
-	Version: "0.6.5",
+	Version: "0.6.6pre.1",
 
 	// Script configurations
 	// bbsmenu.json cache expiration [sec]
-	bbsMenuCacheExprtn: 43200, // 43200 sec = 12 hours
-//	bbsMenuCacheExprtn: 86400, // 86400 sec = 24 hours
+//	bbsMenuCacheExprtn: 43200, // 43200 sec = 12 hours
+	bbsMenuCacheExprtn: 86400, // 86400 sec = 24 hours
+//	bbsMenuCacheExprtn: 172800, // 172800 sec = 48 hours
+
 	// Flag to use local setting.txt of JaneXeno or not (false or true)
 	useLocalSettingTxt: false,
 //	useLocalSettingTxt: true,
@@ -94,6 +98,7 @@ var DispDonguriInfo = {
 		this.ParseSettingTxt();
 		this.GetDatDonguri();
 		this.CreateDonguriTxt();
+		this.AddUpdatedInfo();
 		this.Shell.Popup(this.DonguriTxt, 0, this.WinTitle);
 	},
 	// Initialize object
@@ -252,6 +257,8 @@ var DispDonguriInfo = {
 		}
 		this.httpReqWaitForResponse();
 
+		this.updateInfoObj.setCase("bbsMenuExprd");
+
 		var strm = new ActiveXObject("ADODB.Stream");
 		strm.Type = 1; // adTypeBinary
 		strm.Open();
@@ -377,10 +384,10 @@ var DispDonguriInfo = {
 		if (this.httpReq.Status == "304") // SETTING.TXT is NOT modified
 			return;
 
-		if (this.SettingTxtETag) 
-			this.WinTitle += " - The SETTING.TXT had been modified!";
+		if (this.SettingTxtETag)
+			this.updateInfoObj.setCase("sttngTxtMdfd");
 		else
-			this.WinTitle += " - New board";
+			this.updateInfoObj.setCase("newBoard");
 
 		this.SettingTxtETag = this.httpReq.GetResponseHeader("ETag");
 
@@ -686,6 +693,38 @@ var DispDonguriInfo = {
 		dngrContents.addDngrSect(DonguriInfoTbl);
 		dngrContents.addThrdSect(ThreadInfoTbl);
 		this.DonguriTxt = dngrContents.getDngrTxt();
+	},
+
+	// Updated information table & object
+	// NOT implemented "Setter/Getter" on the JScript...
+	updateInfoObj: {
+		Heading: "更新情報",
+		bbsMenuExprdTxt: "bbsmenu.jsonのキャッシュを更新しました",
+		sttngTxtMdfdTxt: "SETTING.TXTが変更されました",
+		newBoardTxt: "新規の掲示板です",
+		UpdateInfoTxt: "",
+		setCase: function(caseType) {
+			switch (caseType) {
+				case "bbsMenuExprd":
+					this.UpdateInfoTxt += " " + this.bbsMenuExprdTxt;
+					break;
+				case "sttngTxtMdfd":
+					this.UpdateInfoTxt += " " + this.sttngTxtMdfdTxt;
+					break;
+				case "newBoard":
+					this.UpdateInfoTxt += " " + this.newBoardTxt;
+					break;
+				default:
+			}
+			this.UpdateInfoTxt += "\n";
+		}
+	},
+	// Add updated information about bbsmenu.json cache expiration,
+	// SETTING.TXT modification, and visiting a new board.
+	AddUpdatedInfo: function () {
+		if (!this.updateInfoObj.UpdateInfoTxt)
+			return;
+		this.DonguriTxt += "●" + this.updateInfoObj.Heading + "\n" + this.updateInfoObj.UpdateInfoTxt + "\n";
 	}
 }
 
