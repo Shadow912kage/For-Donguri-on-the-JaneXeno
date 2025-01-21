@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.6pre.2
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.6
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,8 @@
 //
 
 // 修正履歴
+//  ver.0.6.6: Added description of the difference between past and modified
+//           : SETTING.TXT regarding the Acorn configuration and writing for BBS.
 //  ver.0.6.6pre.2: Corrected BBS_TITLE's regex pattern and behavior regarding the 'Title' property decision.
 //                : Added processing BBS_BBX_PASS of the SETTING.TXT
 //                : Corrected MaxRows' wrong value (BBS_LINE_NUMBER) from ver.0.6.3pre.2
@@ -39,8 +41,7 @@
 //                : And test code...
 //  ver.0.6.6pre.1: Added information if according to SETTING.TXT is modified,
 //                : visit a new board or bbsmenu.json cache is expired
-//  ver.0.6.5: Added getting & processing a https://menu.5ch.net/bbsmenu.json
-//  ver.0.6.5pre.2: test code...
+//  ver.0.6.5: Added getting & processing a https://menu.5ch.net/bbsmenu.json//  ver.0.6.5pre.2: test code...
 //  ver.0.6.5pre.1: Rewritten HTTP setup and process code
 //  ver.0.6.4: Corrected regex begin/last part of !extend: command, [SPC] -> \s+.
 //  ver.0.6.3: Added a User-Agent header to the HTTP request header
@@ -78,7 +79,7 @@
 
 var DispDonguriInfo = {
   // version number of getdonguri.js
-  Version: "0.6.6pre.2",
+  Version: "0.6.6",
 
   // Script configurations
   // bbsmenu.json cache expiration [sec]
@@ -110,9 +111,10 @@ var DispDonguriInfo = {
   Init: function() {
     this.WinTitle = "どんぐり情報 (" + WScript.ScriptName + " ver." + this.Version + ")";
     this.GetWindowsVersion();
-    this.UserAgent = "Monazilla/1.00 GetDonguri.Js/" + this.Version + " Windows/" + this.WinVersion;
+    this.UserAgent = "Monazilla/1.00 GetDonguri.Js/" + this.Version +
+    " Windows/" + this.WinVersion;
     this.Shell = new ActiveXObject("WScript.Shell");
-    this.ErrMsg = null;
+    this.ErrMsg = "";
     this.SetupHttpReq();
     this.ParseBoardUrl();
     this.CreateCacheFolder();
@@ -134,8 +136,8 @@ var DispDonguriInfo = {
     var httpProgIdWinHttpTbl = [
     {ProgID: "WinHttp.WinHttpRequest.5.1", WinHttp: true}, // XP, 2K Pro SP3, Server 2003, 2K server SP3 or later
     {ProgID: "Msxml2.ServerXMLHTTP.6.0", WinHttp: true},   // unknown
-    {ProgID: "Msxml2.ServerXMLHTTP.3.0",WinHttp: true},     // unknown
-    {ProgID: "Msxml2.XMLHTTP.6.0", WinHttp: false},         // unknown
+    {ProgID: "Msxml2.ServerXMLHTTP.3.0",WinHttp: true},    // unknown
+    {ProgID: "Msxml2.XMLHTTP.6.0", WinHttp: false},        // unknown
     {ProgID: "Msxml2.XMLHTTP.3.0", WinHttp: false}         // unknown
     ];
     for (i = 0; i < httpProgIdWinHttpTbl.length; i++) {
@@ -179,7 +181,8 @@ var DispDonguriInfo = {
     }
   },
   ParseBoardUrl: function() {
-    var Urls = this.BoardUrl.match(/https:\/\/(([-A-Za-z0-9]+)\.5ch\.net)\/([-A-Za-z0-9]+)\//);
+    var Urls =
+    this.BoardUrl.match(/https:\/\/(([-A-Za-z0-9]+)\.5ch\.net)\/([-A-Za-z0-9]+)\//);
     if (Urls) {
       this.ServerFullName = Urls[1]
       this.ServerName = Urls[2];
@@ -193,13 +196,16 @@ var DispDonguriInfo = {
     }
   },
   CreateCacheFolder: function () {
-    var scrFolder = WScript.ScriptFullName.substring(0, WScript.ScriptFullName.lastIndexOf("\\"));
+    var scrFolder =
+    WScript.ScriptFullName.substring(0, WScript.ScriptFullName.lastIndexOf("\\"));
     var cacheFolder = scrFolder + "\\EtagSettingTxt.Cache";
     var fs = new ActiveXObject("Scripting.FileSystemObject");
     if (!fs.FolderExists(cacheFolder))
       fs.CreateFolder(cacheFolder);
-    this.EtagSettingTxtFile = cacheFolder + "\\" + this.ServerName + "." + this.BoardName + ".txt";
-    this.EtagSettingTxtPastFile = cacheFolder + "\\" + this.ServerName + "." + this.BoardName + ".past.txt";
+    this.EtagSettingTxtFile = cacheFolder + "\\" + this.ServerName + "."
+    + this.BoardName + ".txt";
+    this.EtagSettingTxtPastFile = cacheFolder + "\\" + this.ServerName + "."
+    + this.BoardName + ".past.txt";
     this.BbsMenuJsonFile = cacheFolder + "\\" + "bbsmenu.json";
     this.LstModMngmntBrdsFile = cacheFolder + "\\" + "lastmod-mngmntbrds.txt";
   },
@@ -405,7 +411,7 @@ var DispDonguriInfo = {
 
     if (this.SettingTxtETag) {
       this.updateInfoObj.setCase("sttngTxtMdfd");
-      this.SettingTxtOrig = this.SettingTxt; // Save the original SETTING.TXT.
+      this.SettingTxtPast = this.SettingTxt; // Save the past SETTING.TXT.
       this.MoveEtagSettingTxtCacheToPast(); // Move Etag and SETTING.TXT Cache to past file
     } else {
       this.updateInfoObj.setCase("newBoard");
@@ -442,58 +448,43 @@ local board folder.
     strm.SaveToFile(this.EtagSettingTxtFile, 2); // over write, ETag value and SETTING.TXT
     strm.Close();
   },
-  SettnigTxtPropRegexDesc: [
-    // Other board settings
-    {sect: "Gen", propName: 'TitleOrig', Regex: /(BBS_TITLE_ORIG=)(.+)/, ItemName: "板名", Unit: null},
-    {sect: "Gen", propName: 'Title', Regex: /(BBS_TITLE=)([^仮\(\)@＠]+)([\(（]仮[\)）])?([@＠][25]ch掲示板)?/,
-    ItemName: "板名", Unit: null},
-    {sect: "Gen", propName: 'NoName', Regex: /(BBS_NONAME_NAME=)(.+)/, ItemName: "デフォルト名無し", Unit: null},
-    {sect: "Gen", propName: 'SubjLen', Regex: /(BBS_SUBJECT_COUNT=)(.+)/, ItemName: "スレッドタイトル最大バイト数", Unit: "Bytes"},
-    {sect: "Gen", propName: 'NameLen', Regex: /(BBS_NAME_COUNT=)(\d+)/, ItemName: "名前欄最大バイト数", Unit: "Bytes"},
-    {sect: "Gen", propName: 'MailLen', Regex: /(BBS_MAIL_COUNT=)(\d+)/, ItemName: "メール欄最大バイト数", Unit: "Bytes"},
-    {sect: "Gen", propName: 'MaxRows', Regex: /(BBS_LINE_NUMBER=)(\d+)/, ItemName: "本文最大行数", Unit: "行"},
-    {sect: "Gen", propName: 'ResSize', Regex: /(BBS_MESSAGE_COUNT=)(\d+)/, ItemName: "本文最大バイト数", Unit: "Bytes"},
-    {sect: "Gen", propName: 'TateSugi', Regex: /(BBS_THREAD_TATESUGI=)(donguri:(\d)\/(\d+))/, ItemName: "スレ立てに必要などんぐりレベル/TATESUGI値", Unit: null},
-    {sect: "Gen", propName: 'DispIP', Regex: /(BBS_DISP_IP=)(.+)/, ItemName: "強制 IP addr.表示", Unit: null},
-    {sect: "Gen", propName: 'ForceID', Regex: /(BBS_FORCE_ID=)(.+)/, ItemName: "強制 ID 表示", Unit: null},
-    {sect: "Gen", propName: 'SLIP', Regex: /(BBS_SLIP=)(.+)/, ItemName: "SLIP", Unit: null},
-    {sect: "Gen", propName: 'BEID', Regex: /(BBS_BE_ID=)(\d)/, ItemName: "BEログイン", Unit: null},
-    {sect: "Gen", propName: 'NoID', Regex: /(BBS_NO_ID=)(.+)/, ItemName: "ID非表示", Unit: null},
-    {sect: "Gen", propName: 'BBxPass', Regex: /(BBS_BBX_PASS=)(.+)/, ItemName: "BBx規制不適用", Unit: null},
-    // Donguri
-    {sect: "Don", propName: 'Acorn', Regex: /(BBS_ACORN=)(\d)/, ItemName: "BBS_ACORN",
-    ItemDescTbl: ["(どんぐり) は設定されていません", "どんぐりレベル強制表示", "どんぐりレベル非表示 (任意表示)"]},
-    {sect: "Don", propName: 'VipQ2', Regex: /(BBS_USE_VIPQ2=)(\d+)/, ItemName: "BBS_USE_VIPQ2",
-    ItemDescTbl: ["(VIPQ2コマンド) は設定されていません", "!chkBBx: が使用可", "!extend: 等が使用可",
-    "VI1PQ2 コマンド使用時に、段位を表示", "!chkBBx: 使用時にスマホ系はホスト名を一部変換", "(未実装？使用不可？)"]}
-  ],
   // Parse SETTING.TXT
   ParseSettingTxt: function() {
-    // The hashtable between DispDonguriInfo's property and its regex pattern for searching SETTING.TXT 
-    var sttngTxTArray = [{src: this.SettingTxt, str: ''}];
-    //sttngTxTArray.push({src: this.SettingTxt, str: null});
-    if (this.SettingTxtOrig)
-      sttngTxTArray.push({src: this.SettingTxtOrig, str: 'orig'});
-
-    for (var i = 0; i < sttngTxTArray.length; i++) {
-      for (var j = 0; j < this.SettnigTxtPropRegexDesc.length; j++) {
-        var item = sttngTxTArray[i].src.match(this.SettnigTxtPropRegexDesc[j].Regex);
-        if (item) {
-          var _propName = this.SettnigTxtPropRegexDesc[j].propName;
-          switch (_propName) {
-            case 'MaxRows':
-              // The max message line number is BBS_LINE_NUMBER twice,
-              // Enbuged missing from ver.0.6.3pre.2
-              this[_propName] = item[2] * 2;
-              break;
-            case 'TateSugi':
-              this[_propName] = item[3] + "/" + item[4];
-              break;
-            default :
-              this[_propName] = item[2];
-          }
+    // The hashtable between DispDonguriInfo's property and
+    // its regex pattern for searching SETTING.TXT.
+    for (var i = 0; i < SettingTxtPropRegexDesc.length; i++) {
+      var modFlg = bFNotModfd;
+      var item = this.SettingTxt.match(SettingTxtPropRegexDesc[i].Regex);
+      if (item) {
+        modFlg |= bFExistNow;
+        SettingTxtPropRegexDesc[i].StItemName = item[1];
+        SettingTxtPropRegexDesc[i].Prop = item[2];
+        var _propName = SettingTxtPropRegexDesc[i].propName;
+        switch (_propName) {
+          case 'MaxRows':
+            // The max message line number is BBS_LINE_NUMBER twice,
+            // Enbuged missing from ver.0.6.3pre.2
+            this[_propName] = item[2] * 2;
+            break;
+          case 'TateSugi':
+            this[_propName] = item[3] + "/" + item[4];
+            break;
+          default :
+            this[_propName] = item[2];
         }
       }
+
+      if (this.SettingTxtPast) {
+        var itemPast = this.SettingTxtPast.match(SettingTxtPropRegexDesc[i].Regex);
+        if (itemPast) {
+          modFlg |= bFExistPst;
+          SettingTxtPropRegexDesc[i].StItemName = itemPast[1];
+          SettingTxtPropRegexDesc[i].PastProp = itemPast[2];
+          if ((modFlg & bFExistNow ) && (item[2] != itemPast[2]))
+            modFlg |= bFModified;
+        }
+      }
+      SettingTxtPropRegexDesc[i].ModFlg = modFlg; // set modified flag
     }
   },
   // Get 1st res. of local dat and parse it
@@ -530,27 +521,27 @@ local board folder.
   CreateDonguriTxt: function() {
     // General information table & object
     var urlItems = [
-    {propName: 'BoardUrl', ItemName: "掲示板URL", Unit: null},
-    {propName: 'ServerFullName', ItemName: "サーバー名", Unit: null},
-    {propName: 'BoardName', ItemName: "掲示板名", Unit: null},
-    {propName: 'DatNumber', ItemName: "dat番号", Unit: null},
-    {propName: 'ThreadTime', ItemName: "スレッド作成日時", Unit: null}];
+    {propName: 'BoardUrl', ItemName: "掲示板URL", Unit: ""},
+    {propName: 'ServerFullName', ItemName: "サーバー名", Unit: ""},
+    {propName: 'BoardName', ItemName: "掲示板名", Unit: ""},
+    {propName: 'DatNumber', ItemName: "dat番号", Unit: ""},
+    {propName: 'ThreadTime', ItemName: "スレッド作成日時", Unit: ""}];
     var settingtxtItems = [];
     var donguriItems = [];
-    for (var i = 0; i < this.SettnigTxtPropRegexDesc.length; i++) {
-      switch (this.SettnigTxtPropRegexDesc[i].sect) {
+    for (var i = 0; i < SettingTxtPropRegexDesc.length; i++) {
+      switch (SettingTxtPropRegexDesc[i].sect) {
       case "Gen":
         settingtxtItems.push({
-          propName: this.SettnigTxtPropRegexDesc[i].propName,
-          ItemName: this.SettnigTxtPropRegexDesc[i].ItemName,
-          Unit: this.SettnigTxtPropRegexDesc[i].Unit
+          propName: SettingTxtPropRegexDesc[i].propName,
+          ItemName: SettingTxtPropRegexDesc[i].ItemName,
+          Unit: SettingTxtPropRegexDesc[i].Unit
         });
         break;
       case "Don":
         donguriItems.push({
-          propName: this.SettnigTxtPropRegexDesc[i].propName,
-          ItemName: this.SettnigTxtPropRegexDesc[i].ItemName,
-          ItemDescTbl: this.SettnigTxtPropRegexDesc[i].ItemDescTbl
+          propName: SettingTxtPropRegexDesc[i].propName,
+          ItemName: SettingTxtPropRegexDesc[i].ItemName,
+          ItemDescTbl: SettingTxtPropRegexDesc[i].ItemDescTbl
         });
         break;
       }
@@ -558,32 +549,40 @@ local board folder.
 
     var GeneralInfoTbl = [
     {Heading: "URL情報", objItems: urlItems,
-     Notes: "5ch ではスレッド作成日時の UNIX time を 1000 で割った整数部分を dat番号としており、これが被った場合は +1 しています。このため dat番号から作成日時を逆算すると、ミリ秒部分は不明となり実際の秒数とは異なる場合があります。"},
+     Notes: "5chではスレッド作成日時のUNIX time[msec]を1000で割った整数部分をdat番号としており、これが被った場合は+1しています。このためdat番号から作成日時を逆算すると、ミリ秒部分は不明となり実際の秒数とは異なる場合があります。"},
     {Heading: "掲示板設定 (SETTING.TXT)", objItems: settingtxtItems,
-     Notes: "SETTING.TXT に設定項目はありませんが、スレッドのレス上限は 1000、最大datサイズは 512 KB がそれぞれの既定値です。"}];
+     Notes: "SETTING.TXTに設定項目はありませんが、スレッドのレス上限は1000、最大datサイズは512 KB がそれぞれの既定値です。"}];
 
     // Donguri information table & object
     var DonguriInfoTbl = [
-    {Heading: "どんぐり関連設定 (SETTING.TXT)", objItems: donguriItems, Notes: "運営系以外の板ではBBS_USE_VIPQ2=2が既定値です。"}];
+    {Heading: "どんぐり関連設定 (SETTING.TXT)", objItems: donguriItems,
+    Notes: "運営系以外の板ではBBS_USE_VIPQ2=2が既定値です。"}];
 
     // Thread information table & object
     var idDescTbl = {
-      "none": "IDなし", "checked": "強制ID", "default": "板のデフォルトID表示", "on": "板のデフォルトID表示", "": "板のデフォルトID表示"
+      "none": "IDなし", "checked": "強制ID", "default": "板のデフォルトID表示",
+      "on": "板のデフォルトID表示", "": "板のデフォルトID表示"
     };
     var slipDescTbl = {
-      "none": "SLIPなし (ID末尾なし)", "checked": "SLIPなし (簡易ID末尾)", "feature": "SLIPなし (基本ID末尾)", "verbose": "SLIPなし (詳細ID末尾)", "vvv": "回線種別のみ (詳細ID末尾)", "vvvv": "回線種別+IP addr. (詳細ID末尾)", "vvvvv": "回線種別+SLIP (詳細ID末尾)", "vvvvvv": "回線種別+SLIP+IP addr. (詳細ID末尾)", "default": "板のデフォルトSLIP (ID末尾なし)", "on": "板のデフォルトSLIP (ID末尾なし)", "": "板のデフォルトSLIP (ID末尾なし)"
+      "none": "SLIPなし (ID末尾なし)", "checked": "SLIPなし (簡易ID末尾)",
+      "feature": "SLIPなし (基本ID末尾)", "verbose": "SLIPなし (詳細ID末尾)",
+      "vvv": "回線種別のみ (詳細ID末尾)", "vvvv": "回線種別+IP addr. (詳細ID末尾)",
+      "vvvvv": "回線種別+SLIP (詳細ID末尾)", "vvvvvv": "回線種別+SLIP+IP addr. (詳細ID末尾)",
+      "default": "板のデフォルトSLIP (ID末尾なし)", "on": "板のデフォルトSLIP (ID末尾なし)",
+      "": "板のデフォルトSLIP (ID末尾なし)"
     };
-    var cannonDescTbl = ["レベル表示/大砲は板のデフォルト", "強制レベル表示/大砲可", "任意レベル表示/大砲可", "強制レベル表示/大砲不可", "任意レベル表示/大砲不可"];
+    var cannonDescTbl = ["レベル表示/大砲は板のデフォルト", "強制レベル表示/大砲可",
+    "任意レベル表示/大砲可", "強制レベル表示/大砲不可", "任意レベル表示/大砲不可"];
     var threadItems = [
     "!extend: コマンドは使用されていません",
     {propName: 'Id', ItemValues: idDescTbl},
     {propName: 'Slip', ItemValues: slipDescTbl},
-    {propName: 'Resmax', ItemName: "レス上限", Unit: null},
+    {propName: 'Resmax', ItemName: "レス上限", Unit: ""},
     {propName: 'Datmax', ItemName: "最大datサイズ", Unit: "KB"},
     {propName: 'Dlevel', ItemName: "必要どんぐりレベル", Default: "は板のデフォルト"},
     {propName: 'Cannon', ItemValues: cannonDescTbl}];
     var ThreadInfoTbl = [
-    {Heading: "スレッド情報 (!extend: コマンド)", objItems: threadItems, Notes: null}];
+    {Heading: "スレッド情報 (!extend: コマンド)", objItems: threadItems, Notes: ""}];
 
     var dngrContents = {
       // ref. Javascriptで関数内から親関数のプロパティにアクセスしたくて困った話。 - 旧山ｐの楽しいお勉強生活
@@ -745,7 +744,7 @@ local board folder.
     bbsMenuExprdTxt: "bbsmenu.jsonのキャッシュを更新しました",
     sttngTxtMdfdTxt: "SETTING.TXTが変更されました",
     newBoardTxt: "新規の掲示板です",
-    Notes: "当スクリプトで扱っている項目に関してのみSETTING.TXTの変更点の差異を表示します。",
+    sttngTxtNotes: "当スクリプトで扱っている項目に関してのみSETTING.TXTの変更点の差異を表示します。",
     UpdateInfoTxt: "",
     setCase: function(caseType) {
       switch (caseType) {
@@ -754,6 +753,7 @@ local board folder.
           break;
         case "sttngTxtMdfd":
           this.UpdateInfoTxt += " " + this.sttngTxtMdfdTxt;
+          this.Notes = this.sttngTxtNotes;
           break;
         case "newBoard":
           this.UpdateInfoTxt += " " + this.newBoardTxt;
@@ -768,18 +768,139 @@ local board folder.
   AddUpdatedInfo: function () {
     if (!this.updateInfoObj.UpdateInfoTxt)
       return;
-    this.DonguriTxt += "●" + this.updateInfoObj.Heading + "\n" + this.updateInfoObj.UpdateInfoTxt + "\n";
+
+    if (this.SettingTxtPast) {
+      for (var i = 0; i < SettingTxtPropRegexDesc.length; i++) {
+        if (!SettingTxtPropRegexDesc[i].StItemName)
+          continue;
+
+        var modFlg = SettingTxtPropRegexDesc[i].ModFlg;
+        if (modFlg & bFModified) { // modified
+          var descStr = "  " + SettingTxtPropRegexDesc[i].ItemName +
+          "が変更されました：" + SettingTxtPropRegexDesc[i].StItemName +
+          SettingTxtPropRegexDesc[i].PastProp + "→" +
+          SettingTxtPropRegexDesc[i].Prop;
+          if (this.getStrWidth(descStr) > 61) { // Shell.Popup window width is 61 characters in ASCII
+            descStr = "  " + SettingTxtPropRegexDesc[i].ItemName +
+            "が変更されました：" + SettingTxtPropRegexDesc[i].StItemName + "\n   " +
+            SettingTxtPropRegexDesc[i].PastProp + "\n    ↓\n   " +
+            SettingTxtPropRegexDesc[i].Prop;
+          }
+          this.updateInfoObj.UpdateInfoTxt += descStr + "\n";
+        }    
+        switch (modFlg) {
+          case bFExistPst: // removed
+            this.updateInfoObj.UpdateInfoTxt += "  " + SettingTxtPropRegexDesc[i].ItemName +
+            "が削除されました：" + SettingTxtPropRegexDesc[i].StItemName +
+            SettingTxtPropRegexDesc[i].PastProp + "\n";
+            break;
+          case bFExistNow: // added
+            this.updateInfoObj.UpdateInfoTxt += "  " + SettingTxtPropRegexDesc[i].ItemName +
+            "が追加されました：" + SettingTxtPropRegexDesc[i].StItemName +
+            SettingTxtPropRegexDesc[i].Prop + "\n";
+            break;
+        }
+      }
+    }
+
+    this.DonguriTxt += "●" + this.updateInfoObj.Heading + "\n"
+    + this.updateInfoObj.UpdateInfoTxt;
     // add notes
     if (this.updateInfoObj.Notes)
       this.DonguriTxt += "\n" + this.updateInfoObj.Notes + "\n";
     this.DonguriTxt += "\n";
+  },
+  // Shell.Popup window width is 61 characters in ASCII
+  // and 33 characters in multi-bytes (character width retio: 1.84...).
+  getStrWidth: function (str) {
+    var width = 0;
+    for (var i = 0; i  < str.length; i++) {
+      if (str.charAt(i) < 0x7f)
+        width++;
+      else
+        width += 1.85; // 61/33 = 1.848484...
+    }
+    return width;
   }
 }
+
+// SettingTxtPropRegexDesc ModFlg's bits fields:
+var bFNotModfd = 0x00; // 0b00xx: not modified
+var bFExistNow = 0x01; // 0b0xx1: exist now
+var bFExistPst = 0x02; // 0b0x1x: exist past
+var bFModified = 0x04; // 0b01xx: modified
+
+var SettingTxtPropRegexDesc = [
+  // Other board settings
+  {sect: "Gen", propName: 'TitleOrig', Regex: /(BBS_TITLE_ORIG\s*=\s*)(\S+)/,
+  ItemName: "板名", Unit: "", ModFlg: 0x00, StItemName: "",
+  PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'Title',
+  // For some reason, this regular expression will search to the end of
+  // the document unless you suppress the end of the line with '\r'.
+  // Probably because the negated character set '[^xyz]' also matches
+  // the newline characters CR and LF.
+  Regex: /(BBS_TITLE\s*=\s*)([^仮\(\)@＠]+)([\(（]仮[\)）])?([@＠][25]ch掲示板)?\r/,
+  ItemName: "板名", Unit: "", ModFlg: 0x00, StItemName: "",
+  PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'NoName', Regex: /(BBS_NONAME_NAME\s*=\s*)(\S+)/,
+  ItemName: "デフォルト名無し", Unit: "", ModFlg: 0x00, StItemName: "",
+  PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'SubjLen', Regex: /(BBS_SUBJECT_COUNT\s*=\s*)(\d+)/,
+  ItemName: "スレッドタイトル最大バイト数", Unit: "Bytes",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'NameLen', Regex: /(BBS_NAME_COUNT\s*=\s*)(\d+)/,
+  ItemName: "名前欄最大バイト数", Unit: "Bytes",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'MailLen', Regex: /(BBS_MAIL_COUNT\s*=\s*)(\d+)/,
+  ItemName: "メール欄最大バイト数", Unit: "Bytes",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'MaxRows', Regex: /(BBS_LINE_NUMBER\s*=\s*)(\d+)/,
+  ItemName: "本文最大行数", Unit: "行",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'ResSize', Regex: /(BBS_MESSAGE_COUNT\s*=\s*)(\d+)/,
+  ItemName: "本文最大バイト数", Unit: "Bytes",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'TateSugi',
+  Regex: /(BBS_THREAD_TATESUGI\s*=\s*)(donguri:(\d)\/(\d+))/,
+  ItemName: "スレ立てに必要などんぐりレベル/TATESUGI値", Unit: "",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'DispIP', Regex: /(BBS_DISP_IP\s*=\s*)(\S+)/,
+  ItemName: "強制 IP addr.表示", Unit: "",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'ForceID', Regex: /(BBS_FORCE_ID\s*=\s*)(\S+)/,
+  ItemName: "強制 ID 表示", Unit: "",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'SLIP', Regex: /(BBS_SLIP\s*=\s*)(\S+)/,
+  ItemName: "SLIP", Unit: "",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'BEID', Regex: /(BBS_BE_ID\s*=\s*)(\d)/,
+  ItemName: "BEログイン", Unit: "",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'NoID', Regex: /(BBS_NO_ID\s*=\s*)(\S+)/
+  , ItemName: "ID非表示", Unit: "",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  {sect: "Gen", propName: 'BBxPass', Regex: /(BBS_BBX_PASS\s*=\s*)(\S+)/,
+  ItemName: "BBx規制不適用", Unit: "",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
+  // Donguri
+  {sect: "Don", propName: 'Acorn', Regex: /(BBS_ACORN\s*=\s*)(\d)/,
+  ItemName: "BBS_ACORN", ItemDescTbl: ["(どんぐり) は設定されていません", "どんぐりレベル強制表示",
+  "どんぐりレベル非表示 (任意表示)"], ModFlg: 0x00, StItemName: "",
+  PastProp: "", Prop: ""},
+  {sect: "Don", propName: 'VipQ2', Regex: /(BBS_USE_VIPQ2\s*=\s*)(\d+)/,
+  ItemName: "BBS_USE_VIPQ2", ItemDescTbl: ["(VIPQ2コマンド) は設定されていません",
+  "!chkBBx: が使用可", "!extend: 等が使用可", "VI1PQ2 コマンド使用時に、段位を表示",
+  "!chkBBx: 使用時にスマホ系はホスト名を一部変換", "(未実装？使用不可？)"],
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""}
+];
 
 var args = WScript.Arguments;
 if (args.length < 2) { // Arguments check
   var thisname = WScript.ScriptName;
-  var message = "引数の数が足りません！\n\n使用法：\n " + thisname + " 5chの板のURL DATファイル名\n\nJaneXeno のコマンド設定例：\n" + " wscript \"$BASEPATHScript/" + thisname + "\" \"$BURL\" \"$LOCALDAT\"";
+  var message = "引数の数が足りません！\n\n使用法：\n " + thisname
+  + " 5chの板のURL DATファイル名\n\nJaneXeno のコマンド設定例：\n"
+  + " wscript \"$BASEPATHScript/" + thisname + "\" \"$BURL\" \"$LOCALDAT\"";
   WScript.Echo(message);
   WScript.Quit();
 }
