@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.6
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.6.1
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,7 @@
 //
 
 // 修正履歴
+//  ver.0.6.6.1: Corrected regex patterns, '=\s*' to '='.
 //  ver.0.6.6: Added description of the difference between past and modified
 //           : SETTING.TXT regarding the Acorn configuration and writing for BBS.
 //  ver.0.6.6pre.2: Corrected BBS_TITLE's regex pattern and behavior regarding the 'Title' property decision.
@@ -79,7 +80,7 @@
 
 var DispDonguriInfo = {
   // version number of getdonguri.js
-  Version: "0.6.6",
+  Version: "0.6.6.1",
 
   // Script configurations
   // bbsmenu.json cache expiration [sec]
@@ -832,7 +833,7 @@ var bFModified = 0x04; // 0b01xx: modified
 
 var SettingTxtPropRegexDesc = [
   // Other board settings
-  {sect: "Gen", propName: 'TitleOrig', Regex: /(BBS_TITLE_ORIG\s*=\s*)(\S+)/,
+  {sect: "Gen", propName: 'TitleOrig', Regex: /(BBS_TITLE_ORIG\s*=)(\S+)/,
   ItemName: "板名", Unit: "", ModFlg: 0x00, StItemName: "",
   PastProp: "", Prop: ""},
   {sect: "Gen", propName: 'Title',
@@ -840,55 +841,55 @@ var SettingTxtPropRegexDesc = [
   // the document unless you suppress the end of the line with '\r'.
   // Probably because the negated character set '[^xyz]' also matches
   // the newline characters CR and LF.
-  Regex: /(BBS_TITLE\s*=\s*)([^仮\(\)@＠]+)([\(（]仮[\)）])?([@＠][25]ch掲示板)?\r/,
+  Regex: /(BBS_TITLE\s*=)([^仮\(\)@＠]+)([\(（]仮[\)）])?([@＠][25]ch掲示板)?\r/,
   ItemName: "板名", Unit: "", ModFlg: 0x00, StItemName: "",
   PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'NoName', Regex: /(BBS_NONAME_NAME\s*=\s*)(\S+)/,
+  {sect: "Gen", propName: 'NoName', Regex: /(BBS_NONAME_NAME\s*=)(\S+)/,
   ItemName: "デフォルト名無し", Unit: "", ModFlg: 0x00, StItemName: "",
   PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'SubjLen', Regex: /(BBS_SUBJECT_COUNT\s*=\s*)(\d+)/,
+  {sect: "Gen", propName: 'SubjLen', Regex: /(BBS_SUBJECT_COUNT\s*=)(\d+)/,
   ItemName: "スレッドタイトル最大バイト数", Unit: "Bytes",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'NameLen', Regex: /(BBS_NAME_COUNT\s*=\s*)(\d+)/,
+  {sect: "Gen", propName: 'NameLen', Regex: /(BBS_NAME_COUNT\s*=)(\d+)/,
   ItemName: "名前欄最大バイト数", Unit: "Bytes",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'MailLen', Regex: /(BBS_MAIL_COUNT\s*=\s*)(\d+)/,
+  {sect: "Gen", propName: 'MailLen', Regex: /(BBS_MAIL_COUNT\s*=)(\d+)/,
   ItemName: "メール欄最大バイト数", Unit: "Bytes",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'MaxRows', Regex: /(BBS_LINE_NUMBER\s*=\s*)(\d+)/,
+  {sect: "Gen", propName: 'MaxRows', Regex: /(BBS_LINE_NUMBER\s*=)(\d+)/,
   ItemName: "本文最大行数", Unit: "行",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'ResSize', Regex: /(BBS_MESSAGE_COUNT\s*=\s*)(\d+)/,
+  {sect: "Gen", propName: 'ResSize', Regex: /(BBS_MESSAGE_COUNT\s*=)(\d+)/,
   ItemName: "本文最大バイト数", Unit: "Bytes",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
   {sect: "Gen", propName: 'TateSugi',
-  Regex: /(BBS_THREAD_TATESUGI\s*=\s*)(donguri:(\d)\/(\d+))/,
+  Regex: /(BBS_THREAD_TATESUGI\s*=)(donguri:(\d)\/(\d+))/,
   ItemName: "スレ立てに必要などんぐりレベル/TATESUGI値", Unit: "",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'DispIP', Regex: /(BBS_DISP_IP\s*=\s*)(\S+)/,
+  {sect: "Gen", propName: 'DispIP', Regex: /(BBS_DISP_IP\s*=)(\S+)/,
   ItemName: "強制 IP addr.表示", Unit: "",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'ForceID', Regex: /(BBS_FORCE_ID\s*=\s*)(\S+)/,
+  {sect: "Gen", propName: 'ForceID', Regex: /(BBS_FORCE_ID\s*=)(\S+)/,
   ItemName: "強制 ID 表示", Unit: "",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'SLIP', Regex: /(BBS_SLIP\s*=\s*)(\S+)/,
+  {sect: "Gen", propName: 'SLIP', Regex: /(BBS_SLIP\s*=)(\S+)/,
   ItemName: "SLIP", Unit: "",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'BEID', Regex: /(BBS_BE_ID\s*=\s*)(\d)/,
+  {sect: "Gen", propName: 'BEID', Regex: /(BBS_BE_ID\s*=)(\d)/,
   ItemName: "BEログイン", Unit: "",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'NoID', Regex: /(BBS_NO_ID\s*=\s*)(\S+)/
+  {sect: "Gen", propName: 'NoID', Regex: /(BBS_NO_ID\s*=)(\S+)/
   , ItemName: "ID非表示", Unit: "",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
-  {sect: "Gen", propName: 'BBxPass', Regex: /(BBS_BBX_PASS\s*=\s*)(\S+)/,
+  {sect: "Gen", propName: 'BBxPass', Regex: /(BBS_BBX_PASS\s*=)(\S+)/,
   ItemName: "BBx規制不適用", Unit: "",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
   // Donguri
-  {sect: "Don", propName: 'Acorn', Regex: /(BBS_ACORN\s*=\s*)(\d)/,
+  {sect: "Don", propName: 'Acorn', Regex: /(BBS_ACORN\s*=)(\d)/,
   ItemName: "BBS_ACORN", ItemDescTbl: ["(どんぐり) は設定されていません", "どんぐりレベル強制表示",
   "どんぐりレベル非表示 (任意表示)"], ModFlg: 0x00, StItemName: "",
   PastProp: "", Prop: ""},
-  {sect: "Don", propName: 'VipQ2', Regex: /(BBS_USE_VIPQ2\s*=\s*)(\d+)/,
+  {sect: "Don", propName: 'VipQ2', Regex: /(BBS_USE_VIPQ2\s*=)(\d+)/,
   ItemName: "BBS_USE_VIPQ2", ItemDescTbl: ["(VIPQ2コマンド) は設定されていません",
   "!chkBBx: が使用可", "!extend: 等が使用可", "VI1PQ2 コマンド使用時に、段位を表示",
   "!chkBBx: 使用時にスマホ系はホスト名を一部変換", "(未実装？使用不可？)"],
