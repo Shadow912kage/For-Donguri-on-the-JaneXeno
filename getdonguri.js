@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.6.1
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.7
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,7 @@
 //
 
 // 修正履歴
+//  ver.0.6.7: Added checking for fake command line of '!extend:'
 //  ver.0.6.6.1: Corrected regex patterns, '=\s*' to '='.
 //  ver.0.6.6: Added description of the difference between past and modified
 //           : SETTING.TXT regarding the Acorn configuration and writing for BBS.
@@ -80,7 +81,7 @@
 
 var DispDonguriInfo = {
   // version number of getdonguri.js
-  Version: "0.6.6.1",
+  Version: "0.6.7",
 
   // Script configurations
   // bbsmenu.json cache expiration [sec]
@@ -496,16 +497,8 @@ local board folder.
     dat.Close();
     var dngrtop = dat1st.match(/<>( sssp:\/\/img\.5ch\.net\/ico\/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?\s+!extend:(.*?):(.*?):(\d+)?:(\d+)?(:donguri=(\d+)\/(\d))?:{0,2}\s+<br>/);
     var dngrbtm = dat1st.match(/<hr>VIPQ2_EXTDAT: (.+?):(.+?):(\d+):(\d+):(donguri=(\d+)\/(\d))?: EXT was configured <>/);
-    if (dngrtop) {
-      this.Id = dngrtop[2];
-      this.Slip = dngrtop[3];
-      this.Resmax = dngrtop[4] || "1000"; // 1000: Default max number of messages
-      this.Datmax = dngrtop[5] || "512"; // 512: Default message size in bytes
-      if (dngrtop[6]) {
-        this.Dlevel = dngrtop[7];
-        this.Cannon = dngrtop[8];
-      }
-    } else if (dngrbtm) {
+    // Checking for "VIPQ2_EXTDAT:"
+    if (dngrbtm) {
       this.Id = dngrbtm[1];
       this.Slip = dngrbtm[2];
       this.Resmax = dngrbtm[3];
@@ -516,6 +509,23 @@ local board folder.
       }
     } else {
       this.NoExtend = true;
+    }
+    // Checking for "!extend:" line is faked or not
+    if (dngrtop) {
+      if (this.Id != dngrtop[2])
+        this.FakeExtend = true;
+      if (this.Slip != dngrtop[3])
+        this.FakeExtend = true;
+      if (this.Resmax != (dngrtop[4] || "1000"))
+        this.FakeExtend = true;
+      if (this.Datmax != (dngrtop[5] || "512"))
+        this.FakeExtend = true;
+      if (dngrtop[6]) {
+        if (this.Dlevel != dngrtop[7])
+          this.FakeExtend = true;
+        if (this.Cannon != dngrtop[8])
+          this.FakeExtend = true;
+      }
     }
   },
   // Create described text of the Donguri
@@ -576,6 +586,7 @@ local board folder.
     "任意レベル表示/大砲可", "強制レベル表示/大砲不可", "任意レベル表示/大砲不可"];
     var threadItems = [
     "!extend: コマンドは使用されていません",
+    "************** 注意：>>1 の !extend: 行は偽装されたものです **************",
     {propName: 'Id', ItemValues: idDescTbl},
     {propName: 'Slip', ItemValues: slipDescTbl},
     {propName: 'Resmax', ItemName: "レス上限", Unit: ""},
@@ -693,7 +704,10 @@ local board folder.
             this.tInfoTxt += " " + items[0] + "\n\n";
             break;
           }
-          for (var j = 1; j < items.length; j++) {
+          if (this._parent.FakeExtend) {
+            this.tInfoTxt += " " + items[1] + "\n";
+          }
+          for (var j = 2; j < items.length; j++) {
             var _propName = items[j].propName;
             var _property = this._parent[_propName];
             this.tInfoTxt += " ";
