@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.7
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.8
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,7 @@
 //
 
 // 修正履歴
+//  ver.0.6.8: Corrected bugs in checking for fake command line of '!extend:'
 //  ver.0.6.7: Added checking for fake command line of '!extend:'
 //  ver.0.6.6.1: Corrected regex patterns, '=\s*' to '='.
 //  ver.0.6.6: Added description of the difference between past and modified
@@ -43,7 +44,8 @@
 //                : And test code...
 //  ver.0.6.6pre.1: Added information if according to SETTING.TXT is modified,
 //                : visit a new board or bbsmenu.json cache is expired
-//  ver.0.6.5: Added getting & processing a https://menu.5ch.net/bbsmenu.json//  ver.0.6.5pre.2: test code...
+//  ver.0.6.5: Added getting & processing a https://menu.5ch.net/bbsmenu.json
+//  ver.0.6.5pre.2: test code...
 //  ver.0.6.5pre.1: Rewritten HTTP setup and process code
 //  ver.0.6.4: Corrected regex begin/last part of !extend: command, [SPC] -> \s+.
 //  ver.0.6.3: Added a User-Agent header to the HTTP request header
@@ -81,7 +83,7 @@
 
 var DispDonguriInfo = {
   // version number of getdonguri.js
-  Version: "0.6.7",
+  Version: "0.6.8",
 
   // Script configurations
   // bbsmenu.json cache expiration [sec]
@@ -512,6 +514,8 @@ local board folder.
     }
     // Checking for "!extend:" line is faked or not
     if (dngrtop) {
+      dngrtop[2] = dngrtop[2] ? ((dngrtop[2] != "on") ? dngrtop[2] : "default") : "default";
+      dngrtop[3] = dngrtop[3] ? ((dngrtop[3] != "on") ? dngrtop[3] : "default") : "default";
       if (this.Id != dngrtop[2])
         this.FakeExtend = true;
       if (this.Slip != dngrtop[3])
