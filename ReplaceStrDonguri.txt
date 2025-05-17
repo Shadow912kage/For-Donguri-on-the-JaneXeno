@@ -1,4 +1,4 @@
-// Donguri 0.6.4
+// Donguri 0.6.5pre.1
 
 //  1st res top 
 //   <>( sssp://img.5ch.net/ico/IMAGE.FILE(BE icon) <br>) !extend:(ID):(SLIP):(Max res. num.):(Max dat size KB):(donguri=x/y)(:) <br>
@@ -16,6 +16,7 @@
 //  https://donguri.wikiru.jp/?command
 
 // 修正履歴
+//	ver.0.6.5pre.1 : Added faked "!extend:" command line(s) in messag
 //	ver.0.6.4: Corrected regex begin/last part of !extend: command, [SPC] -> \s+. (skip ver.0.6.3)
 //	ver.0.6.2: Changed to remove the first whitespace in the res. body after the donguri information section.
 //	         : "<> !extend:～ <br> res. body" -> "<> !extend:～ <br><hr>Donguri info.<hr>res. body"
@@ -64,6 +65,13 @@
 <rx2>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(\s+!extend:(default|on):.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&<hr>板のデフォルトID表示	msg
 <rx2>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(\s+!extend:none:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&<hr>IDなし	msg
 <rx2>(?<!<br>)( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(\s+!extend:checked:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&<hr>強制ID	msg
+
+//// Faked !extend: check
+////// Cannon
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/1:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^1]): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(レベル表示/大砲可不可)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/2:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^2]): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(レベル表示/大砲可不可)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/3:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^3]): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(レベル表示/大砲可不可)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/4:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^4]): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(レベル表示/大砲可不可)<hr><br> $2	msg
 
 /// VIPQ2_EXTDAT
 //// Donguri cannon
