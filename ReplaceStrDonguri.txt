@@ -1,4 +1,4 @@
-// Donguri 0.6.5pre.1
+// Donguri 0.6.5
 
 //  1st res top 
 //   <>( sssp://img.5ch.net/ico/IMAGE.FILE(BE icon) <br>) !extend:(ID):(SLIP):(Max res. num.):(Max dat size KB):(donguri=x/y)(:) <br>
@@ -16,7 +16,7 @@
 //  https://donguri.wikiru.jp/?command
 
 // 修正履歴
-//	ver.0.6.5pre.1 : Added faked "!extend:" command line(s) in messag
+//	ver.0.6.5: Added checking for fake "!extend:" command line(s) in message
 //	ver.0.6.4: Corrected regex begin/last part of !extend: command, [SPC] -> \s+. (skip ver.0.6.3)
 //	ver.0.6.2: Changed to remove the first whitespace in the res. body after the donguri information section.
 //	         : "<> !extend:～ <br> res. body" -> "<> !extend:～ <br><hr>Donguri info.<hr>res. body"
@@ -73,6 +73,27 @@
 <rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/3:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^3]): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(レベル表示/大砲可不可)<hr><br> $2	msg
 <rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/4:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^4]): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(レベル表示/大砲可不可)<hr><br> $2	msg
 
+////// Donguri level
+// Can't check with a regular expression, maybe...
+////// Max res. number & dat size
+// Unchecked...
+
+////// SLIP
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:(default|on)?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(none|checked|feature|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(SLIP)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:none:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|checked|feature|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(SLIP)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:checked:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|feature|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(SLIP)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:feature:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(SLIP)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:verbose:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(SLIP)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:vvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(SLIP)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:vvvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(SLIP)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:vvvvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(SLIP)<hr><br> $2	msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:.*?:vvvvvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvv|vvvv|vvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(SLIP)<hr><br> $2	msg
+
+////// ID
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:(default|on)?:.*?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:\s+(none|checked):.+:\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(ID)<hr><br> $2		msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:none:.*?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:\s+(default|checked):.+:\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(ID)<hr><br> $2		msg
+<rx2>((?<!<br>)(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(\s+!extend:checked:.*?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:\s+(default|none):.+:\d+:\d+:(donguri=\d+/\d): EXT was configured ))	$1<hr>注意：この !extend:行は偽装されたものです(ID)<hr><br> $2		msg
+
 /// VIPQ2_EXTDAT
 //// Donguri cannon
 <rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:: EXT was configured )	$&, レベル表示/大砲は板のデフォルト<hr>	msg
@@ -96,7 +117,7 @@
 <rx2>(<hr>VIPQ2_EXTDAT:.+?:vvvvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, 回線種別+SLIP(詳細ID末尾)	msg
 <rx2>(<hr>VIPQ2_EXTDAT:.+?:vvvvvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, 回線種別+SLIP+IP addr.(詳細ID末尾)	msg
 //// ID
-<rx2>(<hr>VIPQ2_EXTDAT: default:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>板のデフォルトID表示	msg
-<rx2>(<hr>VIPQ2_EXTDAT: none:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>IDなし	msg
-<rx2>(<hr>VIPQ2_EXTDAT: checked:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>強制ID	msg
+<rx2>(<hr>VIPQ2_EXTDAT:\s+default:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>板のデフォルトID表示	msg
+<rx2>(<hr>VIPQ2_EXTDAT:\s+none:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>IDなし	msg
+<rx2>(<hr>VIPQ2_EXTDAT:\s+checked:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>強制ID	msg
 //	********** End Of Donguri **********
