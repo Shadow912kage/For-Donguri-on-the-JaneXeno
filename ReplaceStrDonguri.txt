@@ -1,4 +1,4 @@
-// Donguri 0.7.0
+// Donguri 0.7.1
 
 //  1st res top 
 //   <>( sssp://img.5ch.net/ico/IMAGE.FILE(BE icon) <br>) !extend:(ID):(SLIP):(Max res. num.):(Max dat size KB):(donguri=x/y)(:) <br>
@@ -16,6 +16,7 @@
 //  https://donguri.wikiru.jp/?command
 
 // 修正履歴
+//  ver.0.7.1: Corrected an editing mistake
 //  ver.0.7.0: Corrected regex patterns completely
 //  ver.0.6.5.1: Corrected wrong regex for fake "!extend:" of SLIP
 //  ver.0.6.5: Added checking for fake "!extend:" command line(s) in message
@@ -108,7 +109,7 @@
 <rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:(\d+):(\d+):(donguri=\d+/\d)?: EXT was configured )	$&, レス上限:$2, 最大datサイズ:$3 KB	msg
 //// SLIP
 <rx2>(<hr>VIPQ2_EXTDAT:.+?:default:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, 板のデフォルトSLIP(ID末尾なし)	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:none:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )$	$&, SLIPなし(ID末尾なし)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:none:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIPなし(ID末尾なし)	msg
 <rx2>(<hr>VIPQ2_EXTDAT:.+?:checked:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIPなし(簡易ID末尾)	msg
 <rx2>(<hr>VIPQ2_EXTDAT:.+?:feature:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIPなし(基本ID末尾)	msg
 <rx2>(<hr>VIPQ2_EXTDAT:.+?:verbose:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIPなし(詳細ID末尾)	msg
