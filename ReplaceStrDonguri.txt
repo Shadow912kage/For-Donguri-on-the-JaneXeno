@@ -1,21 +1,21 @@
-// Donguri 0.7.1
+// Donguri 0.7.2
 
 //  1st res top 
 //   <>( sssp://img.5ch.net/ico/IMAGE.FILE(BE icon) <br>) !extend:(ID):(SLIP):(Max res. num.):(Max dat size KB):(donguri=x/y)(:) <br>
 //  1st res bottom
 //   <hr>VIPQ2_EXTDAT: ID:SLIP:Max res. num.:Max dat size KB:donguri=x/y: EXT was configured <>
 //
-//	SETTING.TXT - ‚T‚¿‚á‚ñ‚Ë‚éwiki
+//	SETTING.TXT - ï¼•ã¡ã‚ƒã‚“ã­ã‚‹wiki
 //	https://info.5ch.net/index.php/SETTING.TXT
-//	BBS_SLIP - ‚T‚¿‚á‚ñ‚Ë‚éwiki
+//	BBS_SLIP - ï¼•ã¡ã‚ƒã‚“ã­ã‚‹wiki
 //	https://info.5ch.net/index.php/BBS_SLIP
-//	V¶VIPQ2 - ‚T‚¿‚á‚ñ‚Ë‚éwiki
+//	æ–°ç”ŸVIPQ2 - ï¼•ã¡ã‚ƒã‚“ã­ã‚‹wiki
 //	https://info.5ch.net/index.php/%E6%96%B0%E7%94%9FVIPQ2#!extend:
 //
-//  ƒRƒ}ƒ“ƒh - 5ch‚Ç‚ñ‚®‚è”ñŒö®‚Ü‚Æ‚ßwiki
+//  ã‚³ãƒãƒ³ãƒ‰ - 5chã©ã‚“ãã‚Šéå…¬å¼ã¾ã¨ã‚wiki
 //  https://donguri.wikiru.jp/?command
 
-// C³—š—ğ
+// ä¿®æ­£å±¥æ­´
 //  ver.0.7.2: Added "(?:\s+<br>)*?" before the "!extend:" command regex
 //  ver.0.7.1: Corrected an editing mistake
 //  ver.0.7.0: Corrected regex patterns completely
@@ -23,7 +23,7 @@
 //  ver.0.6.5: Added checking for fake "!extend:" command line(s) in message
 //  ver.0.6.4: Corrected regex begin/last part of !extend: command, [SPC] -> \s+. (skip ver.0.6.3)
 //  ver.0.6.2: Changed to remove the first whitespace in the res. body after the donguri information section.
-//           : "<> !extend:` <br> res. body" -> "<> !extend:` <br><hr>Donguri info.<hr>res. body"
+//           : "<> !extend:ï½ <br> res. body" -> "<> !extend:ï½ <br><hr>Donguri info.<hr>res. body"
 //  ver.0.6.1: Corrected regexs with BE icon. Omitted handled JaneXeno's rendering issue.
 //  ver.0.6: Added regexs with BE icon (sssp://~). And handled JaneXeno's rendering issue.
 //         : Maybe, JaneXeno renders unnecessary whitespace between the <hr> and the hyperlink.
@@ -36,44 +36,44 @@
 
 /// Res top
 //// Donguri cannon
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:{0,2}\s+<br>)+(?: )	$&, ƒŒƒxƒ‹•\¦/‘å–C‚Í”Â‚ÌƒfƒtƒHƒ‹ƒg<hr>	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/1:{0,2}\s+<br>)+(?: )	$&, ‹­§ƒŒƒxƒ‹•\¦/‘å–C‰Â<hr>	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/2:{0,2}\s+<br>)+(?: )	$&, ”CˆÓƒŒƒxƒ‹•\¦/‘å–C‰Â<hr>	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/3:{0,2}\s+<br>)+(?: )	$&, ‹­§ƒŒƒxƒ‹•\¦/‘å–C•s‰Â<hr>	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/4:{0,2}\s+<br>)+(?: )	$&, ”CˆÓƒŒƒxƒ‹•\¦/‘å–C•s‰Â<hr>	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:{0,2}\s+<br>)+(?: )	$&, ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²ã¯æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ<hr>	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/1:{0,2}\s+<br>)+(?: )	$&, å¼·åˆ¶ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯<hr>	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/2:{0,2}\s+<br>)+(?: )	$&, ä»»æ„ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯<hr>	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/3:{0,2}\s+<br>)+(?: )	$&, å¼·åˆ¶ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²ä¸å¯<hr>	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*):donguri=\d+/4:{0,2}\s+<br>)+(?: )	$&, ä»»æ„ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²ä¸å¯<hr>	msg
 
 //// Donguri level
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:{0,2}\s+<br>)+	$&, •K—v‚Ç‚ñ‚®‚èƒŒƒxƒ‹‚Í”Â‚ÌƒfƒtƒHƒ‹ƒg	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?(:donguri=(\d+)/\d):{0,2}\s+<br>)+	$&, •K—v‚Ç‚ñ‚®‚èƒŒƒxƒ‹:$6	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:{0,2}\s+<br>)+	$&, å¿…è¦ã©ã‚“ãã‚Šãƒ¬ãƒ™ãƒ«ã¯æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?(:donguri=(\d+)/\d):{0,2}\s+<br>)+	$&, å¿…è¦ã©ã‚“ãã‚Šãƒ¬ãƒ™ãƒ«:$6	msg
 
 //// Max res. number & dat size
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d+):(\d+)(:donguri=\d+/\d)?:?\s+<br>)+	$&, ƒŒƒXãŒÀ:$3, Å‘ådatƒTƒCƒY:$4 KB	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?::(\d+)(:donguri=\d+/\d)?:?\s+<br>)+	$&, ƒŒƒXãŒÀ:1000, Å‘ådatƒTƒCƒY:$3 KB	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d+):(:donguri=\d+/\d)?:?\s+<br>)+	$&, ƒŒƒXãŒÀ:$3, Å‘ådatƒTƒCƒY:512 KB	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?::(:donguri=\d+/\d)?:?\s+<br>)+	$&, ƒŒƒXãŒÀ:1000, Å‘ådatƒTƒCƒY:512 KB	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d+):(\d+)(:donguri=\d+/\d)?:?\s+<br>)+	$&, ãƒ¬ã‚¹ä¸Šé™:$3, æœ€å¤§datã‚µã‚¤ã‚º:$4 KB	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?::(\d+)(:donguri=\d+/\d)?:?\s+<br>)+	$&, ãƒ¬ã‚¹ä¸Šé™:1000, æœ€å¤§datã‚µã‚¤ã‚º:$3 KB	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d+):(:donguri=\d+/\d)?:?\s+<br>)+	$&, ãƒ¬ã‚¹ä¸Šé™:$3, æœ€å¤§datã‚µã‚¤ã‚º:512 KB	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:.*?::(:donguri=\d+/\d)?:?\s+<br>)+	$&, ãƒ¬ã‚¹ä¸Šé™:1000, æœ€å¤§datã‚µã‚¤ã‚º:512 KB	msg
 
 //// SLIP
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:(default|on)?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, ”Â‚ÌƒfƒtƒHƒ‹ƒgSLIP(ID––”ö‚È‚µ)	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:none:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, SLIP‚È‚µ(ID––”ö‚È‚µ)	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:checked:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, SLIP‚È‚µ(ŠÈˆÕID––”ö)	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:feature:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, SLIP‚È‚µ(Šî–{ID––”ö)	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:verbose:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, SLIP‚È‚µ(Ú×ID––”ö)	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:vvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, ‰ñüí•Ê‚Ì‚İ(Ú×ID––”ö)	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:vvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, ‰ñüí•Ê+IP addr.(Ú×ID––”ö)	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:vvvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, ‰ñüí•Ê+SLIP(Ú×ID––”ö)	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:vvvvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, ‰ñüí•Ê+SLIP+IP addr.(Ú×ID––”ö)	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:(default|on)?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆSLIP(IDæœ«å°¾ãªã—)	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:none:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, SLIPãªã—(IDæœ«å°¾ãªã—)	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:checked:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, SLIPãªã—(ç°¡æ˜“IDæœ«å°¾)	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:feature:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, SLIPãªã—(åŸºæœ¬IDæœ«å°¾)	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:verbose:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, SLIPãªã—(è©³ç´°IDæœ«å°¾)	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:vvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, å›ç·šç¨®åˆ¥ã®ã¿(è©³ç´°IDæœ«å°¾)	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:vvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, å›ç·šç¨®åˆ¥+IP addr.(è©³ç´°IDæœ«å°¾)	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:vvvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, å›ç·šç¨®åˆ¥+SLIP(è©³ç´°IDæœ«å°¾)	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:.*?:vvvvvv:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&, å›ç·šç¨®åˆ¥+SLIP+IP addr.(è©³ç´°IDæœ«å°¾)	msg
 
 //// ID
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:(default|on)?:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&<hr>”Â‚ÌƒfƒtƒHƒ‹ƒgID•\¦	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:none:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&<hr>ID‚È‚µ	msg
-<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:checked:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&<hr>‹­§ID	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:(default|on)?:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&<hr>æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆIDè¡¨ç¤º	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:none:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&<hr>IDãªã—	msg
+<rx2>^( sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?(?:\s+<br>)*?(\s+!extend:checked:.*?:(\d*)?:(\d*)?(:donguri=\d+/\d)?:{0,2}\s+<br>)+	$&<hr>å¼·åˆ¶ID	msg
 
 //// Faked !extend: check
 ////// Cannon
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/1:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^1]): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(ƒŒƒxƒ‹•\¦/‘å–C‰Â•s‰Â)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/2:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^2]): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(ƒŒƒxƒ‹•\¦/‘å–C‰Â•s‰Â)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/3:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^3]): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(ƒŒƒxƒ‹•\¦/‘å–C‰Â•s‰Â)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/4:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^4]): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(ƒŒƒxƒ‹•\¦/‘å–C‰Â•s‰Â)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/1:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^1]): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯ä¸å¯)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/2:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^2]): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯ä¸å¯)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/3:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^3]): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯ä¸å¯)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:.*?:(\d*)?:(\d*)?:(donguri=\d+/4:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:(donguri=\d+/[^4]): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯ä¸å¯)<hr><br> $2	msg
 
 ////// Donguri level
 // Can't check with a regular expression, maybe...
@@ -81,45 +81,46 @@
 // Unchecked...
 
 ////// SLIP
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:(default|on)?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(none|checked|feature|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(SLIP)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:none:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|checked|feature|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(SLIP)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:checked:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|feature|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(SLIP)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:feature:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(SLIP)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:verbose:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(SLIP)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:vvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(SLIP)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:vvvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(SLIP)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:vvvvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvv|vvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(SLIP)<hr><br> $2	msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:vvvvvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvv|vvvv|vvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(SLIP)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:(default|on)?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(none|checked|feature|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(SLIP)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:none:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|checked|feature|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(SLIP)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:checked:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|feature|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(SLIP)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:feature:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|verbose|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(SLIP)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:verbose:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|vvv|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(SLIP)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:vvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(SLIP)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:vvvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvv|vvvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(SLIP)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:vvvvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvv|vvvv|vvvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(SLIP)<hr><br> $2	msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:.*?:vvvvvv:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:.+?:(default|none|checked|feature|verbose|vvv|vvvv|vvvvv):\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(SLIP)<hr><br> $2	msg
 
 ////// ID
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:(default|on)?:.*?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:\s+(none|checked):.+:\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(ID)<hr><br> $2		msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:none:.*?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:\s+(default|checked):.+:\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(ID)<hr><br> $2		msg
-<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:checked:.*?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:\s+(default|none):.+:\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>’ˆÓF‚±‚Ì !extend:s‚Í‹U‘•‚³‚ê‚½‚à‚Ì‚Å‚·(ID)<hr><br> $2		msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:(default|on)?:.*?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:\s+(none|checked):.+:\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(ID)<hr><br> $2		msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:none:.*?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:\s+(default|checked):.+:\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(ID)<hr><br> $2		msg
+<rx2>(^(?: sssp://img\.5ch\.net/ico/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?)(?:\s+<br>)*?(\s+!extend:checked:.*?:(\d*)?:(\d*)?:(donguri=\d+/\d:?\s+<br>).*(<hr>VIPQ2_EXTDAT:\s+(default|none):.+:\d+:\d+:(donguri=\d+/\d): EXT was configured )$)	$1<hr>æ³¨æ„ï¼šã“ã® !extend:è¡Œã¯å½è£…ã•ã‚ŒãŸã‚‚ã®ã§ã™(ID)<hr><br> $2		msg
 
 /// VIPQ2_EXTDAT
 //// Donguri cannon
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:: EXT was configured )$	$&, ƒŒƒxƒ‹•\¦/‘å–C‚Í”Â‚ÌƒfƒtƒHƒ‹ƒg<hr>	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=\d+/1: EXT was configured )$	$&, ‹­§ƒŒƒxƒ‹•\¦/‘å–C‰Â<hr>	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=\d+/2: EXT was configured )$	$&, ”CˆÓƒŒƒxƒ‹•\¦/‘å–C‰Â<hr>	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=\d+/3: EXT was configured )$	$&, ‹­§ƒŒƒxƒ‹•\¦/‘å–C•s‰Â<hr>	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=\d+/4: EXT was configured )$	$&, ”CˆÓƒŒƒxƒ‹•\¦/‘å–C•s‰Â<hr>	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:: EXT was configured )$	$&, ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²ã¯æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ<hr>	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=\d+/1: EXT was configured )$	$&, å¼·åˆ¶ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯<hr>	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=\d+/2: EXT was configured )$	$&, ä»»æ„ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²å¯<hr>	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=\d+/3: EXT was configured )$	$&, å¼·åˆ¶ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²ä¸å¯<hr>	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=\d+/4: EXT was configured )$	$&, ä»»æ„ãƒ¬ãƒ™ãƒ«è¡¨ç¤º/å¤§ç ²ä¸å¯<hr>	msg
 //// Donguri level
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:: EXT was configured )	$&, •K—v‚Ç‚ñ‚®‚èƒŒƒxƒ‹‚Í”Â‚ÌƒfƒtƒHƒ‹ƒg	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=(\d+)/\d: EXT was configured )	$&, •K—v‚Ç‚ñ‚®‚èƒŒƒxƒ‹:$2	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:: EXT was configured )	$&, å¿…è¦ã©ã‚“ãã‚Šãƒ¬ãƒ™ãƒ«ã¯æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:\d+:\d+:donguri=(\d+)/\d: EXT was configured )	$&, å¿…è¦ã©ã‚“ãã‚Šãƒ¬ãƒ™ãƒ«:$2	msg
 //// Max res. number & dat size
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:(\d+):(\d+):(donguri=\d+/\d)?: EXT was configured )	$&, ƒŒƒXãŒÀ:$2, Å‘ådatƒTƒCƒY:$3 KB	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:.+?:(\d+):(\d+):(donguri=\d+/\d)?: EXT was configured )	$&, ãƒ¬ã‚¹ä¸Šé™:$2, æœ€å¤§datã‚µã‚¤ã‚º:$3 KB	msg
 //// SLIP
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:default:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, ”Â‚ÌƒfƒtƒHƒ‹ƒgSLIP(ID––”ö‚È‚µ)	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:none:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIP‚È‚µ(ID––”ö‚È‚µ)	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:checked:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIP‚È‚µ(ŠÈˆÕID––”ö)	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:feature:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIP‚È‚µ(Šî–{ID––”ö)	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:verbose:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIP‚È‚µ(Ú×ID––”ö)	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:vvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, ‰ñüí•Ê‚Ì‚İ(Ú×ID––”ö)	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:vvvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, ‰ñüí•Ê+IP addr.(Ú×ID––”ö)	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:vvvvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, ‰ñüí•Ê+SLIP(Ú×ID––”ö)	msg
-<rx2>(<hr>VIPQ2_EXTDAT:.+?:vvvvvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, ‰ñüí•Ê+SLIP+IP addr.(Ú×ID––”ö)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:default:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆSLIP(IDæœ«å°¾ãªã—)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:none:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIPãªã—(IDæœ«å°¾ãªã—)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:checked:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIPãªã—(ç°¡æ˜“IDæœ«å°¾)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:feature:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIPãªã—(åŸºæœ¬IDæœ«å°¾)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:verbose:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, SLIPãªã—(è©³ç´°IDæœ«å°¾)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:vvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, å›ç·šç¨®åˆ¥ã®ã¿(è©³ç´°IDæœ«å°¾)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:vvvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, å›ç·šç¨®åˆ¥+IP addr.(è©³ç´°IDæœ«å°¾)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:vvvvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, å›ç·šç¨®åˆ¥+SLIP(è©³ç´°IDæœ«å°¾)	msg
+<rx2>(<hr>VIPQ2_EXTDAT:.+?:vvvvvv:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&, å›ç·šç¨®åˆ¥+SLIP+IP addr.(è©³ç´°IDæœ«å°¾)	msg
 //// ID
-<rx2>(<hr>VIPQ2_EXTDAT:\s+default:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>”Â‚ÌƒfƒtƒHƒ‹ƒgID•\¦	msg
-<rx2>(<hr>VIPQ2_EXTDAT:\s+none:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>ID‚È‚µ	msg
-<rx2>(<hr>VIPQ2_EXTDAT:\s+checked:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>‹­§ID	msg
+<rx2>(<hr>VIPQ2_EXTDAT:\s+default:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>æ¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆIDè¡¨ç¤º	msg
+<rx2>(<hr>VIPQ2_EXTDAT:\s+none:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>IDãªã—	msg
+<rx2>(<hr>VIPQ2_EXTDAT:\s+checked:.+?:\d+:\d+:(donguri=\d+/\d)?: EXT was configured )	$&<hr>å¼·åˆ¶ID	msg
+
 //	********** End Of Donguri **********
