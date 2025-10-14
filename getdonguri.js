@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.8
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.9
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,7 @@
 //
 
 // 修正履歴
+//  ver.0.6.9: Added processing BBS_ACORN_GATE of the SETTING.TXT
 //  ver.0.6.8: Corrected bugs in checking for fake command line of '!extend:'
 //  ver.0.6.7: Added checking for fake command line of '!extend:'
 //  ver.0.6.6.1: Corrected regex patterns, '=\s*' to '='.
@@ -83,7 +84,7 @@
 
 var DispDonguriInfo = {
   // version number of getdonguri.js
-  Version: "0.6.8",
+  Version: "0.6.9",
 
   // Script configurations
   // bbsmenu.json cache expiration [sec]
@@ -566,7 +567,7 @@ local board folder.
     {Heading: "URL情報", objItems: urlItems,
      Notes: "5chではスレッド作成日時のUNIX time[msec]を1000で割った整数部分をdat番号としており、これが被った場合は+1しています。このためdat番号から作成日時を逆算すると、ミリ秒部分は不明となり実際の秒数とは異なる場合があります。"},
     {Heading: "掲示板設定 (SETTING.TXT)", objItems: settingtxtItems,
-     Notes: "SETTING.TXTに設定項目はありませんが、スレッドのレス上限は1000、最大datサイズは512 KB がそれぞれの既定値です。"}];
+     Notes: "SETTING.TXTに設定項目はありませんが、スレッドのレス上限は1000、最大datサイズは512 KB がそれぞれの既定値です。\nどんぐり機能有効化はSETTING.TXTより上位の掲示板システムにてfalse/trueが設定されます。"}];
 
     // Donguri information table & object
     var DonguriInfoTbl = [
@@ -903,6 +904,9 @@ var SettingTxtPropRegexDesc = [
   ItemName: "BBx規制不適用", Unit: "",
   ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
   // Donguri
+  {sect: "Gen", propName: 'AcornGate', Regex: /(BBS_ACORN_GATE\s*=)(\S+)/,
+  ItemName: "どんぐり機能有効化", Unit: "",
+  ModFlg: 0x00, StItemName: "", PastProp: "", Prop: ""},
   {sect: "Don", propName: 'Acorn', Regex: /(BBS_ACORN\s*=)(\d)/,
   ItemName: "BBS_ACORN", ItemDescTbl: ["(どんぐり) は設定されていません", "どんぐりレベル強制表示",
   "どんぐりレベル非表示 (任意表示)"], ModFlg: 0x00, StItemName: "",
