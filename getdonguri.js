@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.6.9
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.7.0
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,7 @@
 //
 
 // 修正履歴
+//  ver.0.7.0: Added processing BBS.CGI & DONGURI statuses of the board top page
 //  ver.0.6.9: Added processing BBS_ACORN_GATE of the SETTING.TXT
 //  ver.0.6.8: Corrected bugs in checking for fake command line of '!extend:'
 //  ver.0.6.7: Added checking for fake command line of '!extend:'
@@ -71,7 +72,7 @@
 //         : Corrected parsing for BBS_USE_VIPQ2, regex (\d) -> (\d+)
 //         : WIP... stream and file access with ADODB
 //  ver.0.5: Corrected regexp with BE icon (sssp://~)
-//  ver.0.4: Added max res. number & max dat size informastions
+//  ver.0.4: Added max res. number & max dat size informations
 //         : Correct regexp. of required donguri level
 //         : Added a process to handle commands with omitted parameters
 //         : Correct regexps of donguri level & cannon availability with omitted parameters
@@ -84,7 +85,7 @@
 
 var DispDonguriInfo = {
   // version number of getdonguri.js
-  Version: "0.6.9",
+  Version: "0.7.0",
 
   // Script configurations
   // bbsmenu.json cache expiration [sec]
@@ -101,6 +102,8 @@ var DispDonguriInfo = {
     // initalize
     this.Init();
     // display dialog window
+    this.GetBrdTopPage();
+    this.ParseBrdTopPage();
     //this.GetBbsMenuJsonCache();
     this.GetLastModifyMngmntBrdsCache();
     this.GetBBSMenuJson();
@@ -213,6 +216,7 @@ var DispDonguriInfo = {
     + this.BoardName + ".past.txt";
     this.BbsMenuJsonFile = cacheFolder + "\\" + "bbsmenu.json";
     this.LstModMngmntBrdsFile = cacheFolder + "\\" + "lastmod-mngmntbrds.txt";
+    this.BrdTopPageFile = cacheFolder + "\\BrdTopPage";
   },
   // Display error message & quit process
   DispErr: function() {
@@ -492,6 +496,44 @@ local board folder.
       SettingTxtPropRegexDesc[i].ModFlg = modFlg; // set modified flag
     }
   },
+  // Get a board top page on the 5ch board resource
+  GetBrdTopPage: function() {
+    try {
+      this.httpReq.open("GET", this.BoardUrl, true);
+      this.httpReq.setRequestHeader("User-Agent", this.UserAgent);
+      this.httpReq.send();
+    } catch (e) {
+      this.httpReqOnError(e, this.BoardUrl + "を取得できませんでした");
+    }
+    this.httpReqWaitForResponse();
+
+    var strm = new ActiveXObject("ADODB.Stream");
+    strm.Type = 1; // adTypeBinary
+    strm.Open();
+    strm.Write(this.httpReq.ResponseBody);
+    strm.Position = 2; // Skip BOM(FF FE), top of the ResponseBody(encoded with UTF-16)
+    strm.SaveToFile(this.BrdTopPageFile, 2); // over write raw board top page
+    strm.Type = 2; // adTypeText
+    strm.Charset = "shift_jis";
+    strm.LoadFromFile(this.BrdTopPageFile);
+    this.BrdTopPage = strm.ReadText();
+    strm.Position = 0; // Reset writing position
+    strm.WriteText(this.BrdTopPage);
+    strm.SaveToFile(this.BrdTopPageFile, 2); // over write board top page
+    strm.Close();
+    var fs = WScript.CreateObject("Scripting.FileSystemObject");
+    if (fs.FileExists(this.BrdTopPageFile))
+      fs.DeleteFile(this.BrdTopPageFile);  // Delete board top page file
+  },
+  // Parse a board top page
+  ParseBrdTopPage: function() {
+    this.BoardInfo = [];
+    var brdinfo = this.BrdTopPage.match(/<\/a>\s*(BBS\.CGI\s+-\s+\d{4}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2}\s+\S{3})<[^>]+>[\s\S]+(DONGURI\s+[^:]+:\s+.+?)<[^>]+>[\s\S]+(DONGURI\s+[^:]+:\s+.+?)<[^>]+>/);
+    if (brdinfo) {
+      for (var i = 1; i < brdinfo.length; i++) // Remove html tags & store board system informations
+        this.BoardInfo[i - 1] = brdinfo[i].replace(/<[^>]+>/g, " ").replace(/\s{2,}/g, " ").replace(/ $/, "");
+    }
+  },
   // Get 1st res. of local dat and parse it
   GetDatDonguri: function() {
     var fs = new ActiveXObject("Scripting.FileSystemObject");
@@ -563,6 +605,7 @@ local board folder.
       }
     }
 
+    var BSystemInfoObj = {Heading: "掲示板システム情報", Notes: ""};
     var GeneralInfoTbl = [
     {Heading: "URL情報", objItems: urlItems,
      Notes: "5chではスレッド作成日時のUNIX time[msec]を1000で割った整数部分をdat番号としており、これが被った場合は+1しています。このためdat番号から作成日時を逆算すると、ミリ秒部分は不明となり実際の秒数とは異なる場合があります。"},
@@ -606,10 +649,21 @@ local board folder.
       //      https://yamap-55.hatenadiary.org/entry/20140201/1391235026
       _parent: this, // store 'this' to _parent property for accessing the parent object from the child object
 
+      bInfoTxt: "", // Board system information text from board top page
       gInfoTxt: "", // General information text from SETTING.TXT
       dInfoTxt: "", // Donguri information text from SETTING.TXT
       tInfoTxt: "", // Thread information text from !extend command or VIPQ2_EXTDAT of the 1st. message in the thread
-      getDngrTxt: function () { return(this.gInfoTxt + this.dInfoTxt + this.tInfoTxt);},
+      getDngrTxt: function () { return(this.bInfoTxt + this.gInfoTxt + this.dInfoTxt + this.tInfoTxt);},
+
+      // Add Board system information from board top page
+      addBSysSect: function(bInfoObj) {
+        this.bInfoTxt += "●" + bInfoObj.Heading + "\n";
+        for (var i = 0; i < this._parent.BoardInfo.length; i++)
+          this.bInfoTxt += " " + this._parent.BoardInfo[i] + "\n";
+        if (bInfoObj.Notes)
+          this.bInfoTxt += "\n" + bInfoObj.Notes + "\n";
+        this.bInfoTxt += "\n";
+      },
 
       // Add General information section from SETTING.TXT
       addGnrlSect: function(gInfoTbl) {
@@ -751,6 +805,7 @@ local board folder.
       }
     };
 
+    dngrContents.addBSysSect(BSystemInfoObj);
     dngrContents.addGnrlSect(GeneralInfoTbl);
     dngrContents.addDngrSect(DonguriInfoTbl);
     dngrContents.addThrdSect(ThreadInfoTbl);
