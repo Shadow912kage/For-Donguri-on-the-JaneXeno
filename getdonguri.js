@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.7.0
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.7.2
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -32,6 +32,11 @@
 //
 
 // 修正履歴
+//  ver.0.7.2: Changed the method of getting Windows information.
+//           : Added UBR to Windows version number string.
+//  ver.0.7.1: Corrected charAt() to charCodeAt() in the getStrWidth().
+//           : However, the function getStrWidth() does not work as expected.
+//           : Corrected file encoding converter method.
 //  ver.0.7.0: Added processing BBS.CGI & DONGURI statuses of the board top page
 //  ver.0.6.9: Added processing BBS_ACORN_GATE of the SETTING.TXT
 //  ver.0.6.8: Corrected bugs in checking for fake command line of '!extend:'
@@ -85,7 +90,7 @@
 
 var DispDonguriInfo = {
   // version number of getdonguri.js
-  Version: "0.7.0",
+  Version: "0.7.2",
 
   // Script configurations
   // bbsmenu.json cache expiration [sec]
@@ -117,11 +122,12 @@ var DispDonguriInfo = {
   },
   // Initialize object
   Init: function() {
+    this.Shell = new ActiveXObject("WScript.Shell");
     this.WinTitle = "どんぐり情報 (" + WScript.ScriptName + " ver." + this.Version + ")";
-    this.GetWindowsVersion();
+    this.getWindowsInfo();
+    this.getWindowsVersion();
     this.UserAgent = "Monazilla/1.00 GetDonguri.Js/" + this.Version +
     " Windows/" + this.WinVersion;
-    this.Shell = new ActiveXObject("WScript.Shell");
     this.ErrMsg = "";
     this.SetupHttpReq();
     this.ParseBoardUrl();
@@ -130,13 +136,64 @@ var DispDonguriInfo = {
     this.bbsMenuJsonLastModify = 0;
     this.mngmntBoards = [];
   },
+  //      Solved: Read/write registry values in javascript | Experts Exchange
+  //      https://www.experts-exchange.com/questions/22601573/Read-write-registry-values-in-javascript.html
+  //      registry - HKLM\Software\Microsoft\Windows NT\CurrentVersion: What's the difference between CurrentBuild and CurrentBuildNu mber? - Stack Overflow
+  //      https://stackoverflow.com/questions/37877599/hklm-software-microsoft-windows-nt-currentversion-whats-the-difference-between
+  //      テクニック.1 - 更新管理に役立つバージョン、ビルド情報の取得
+  //      https://www2.say-tech.co.jp/special/ryo-yamaichi/tec-001
+  getWindowsInfo: function() {
+    var regVersionInfo = {
+      regKeyRoot: "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\",
+      regKeyTbl: [
+      "CurrentBuild",              // Actual system build number
+      "CurrentBuildNumber",        // Compatibility mode build number
+      "CurrentMajorVersionNumber", // Windows major version number
+      "CurrentMinorVersionNumber", // Windows minor version number
+      "CurrentVersion",            // Windows version number, OLD
+      "DisplayVersion",            // 2xHx
+      "EditionID",                 // Professional/Home
+      "ProductName",               // Windows xx Pro/Home
+      "ReleaseId",                 // 200x
+      "UBR"                        // Update Build Revision
+      ]
+    };
+    var regKey = "";
+    this.WindowsInfo = {};
+    for (var i = 0; i < regVersionInfo.regKeyTbl.length; i++) {
+      regKey = regVersionInfo.regKeyRoot + regVersionInfo.regKeyTbl[i];
+      this.WindowsInfo[regVersionInfo.regKeyTbl[i]] = this.Shell.RegRead(regKey);
+    }
+    // ProductFullName
+    this.WindowsInfo.ProductFullName = this.WindowsInfo.ProductName;
+    if (this.WindowsInfo.DisplayVersion)
+      this.WindowsInfo.ProductFullName += " " + this.WindowsInfo.DisplayVersion;
+    else
+      this.WindowsInfo.ProductFullName += " " + this.WindowsInfo.ReleaseId;
+    // FullVersionNumber
+    if (this.WindowsInfo.CurrentMajorVersionNumber)
+      this.WindowsInfo.FullVersionNumber =
+        this.WindowsInfo.CurrentMajorVersionNumber + "." +
+        this.WindowsInfo.CurrentMinorVersionNumber;
+    else
+      this.WindowsInfo.FullVersionNumber = this.WindowsInfo.CurrentVersion;
+    // FullBuildNumber
+    this.WindowsInfo.FullBuildNumber = this.WindowsInfo.CurrentBuild;
+    if (this.WindowsInfo.UBR)
+      this.WindowsInfo.FullBuildNumber += "." + this.WindowsInfo.UBR;
+  },
+  getWindowsVersion: function() {
+/*
   // ref. windows - Find OS Name/Version using JScript - Stack Overflow
   //      https://stackoverflow.com/questions/351282/find-os-name-version-using-jscript
-  GetWindowsVersion: function() {
     var objWMISrvc = GetObject("winmgmts:\\\\.\\root\\CIMV2");
-    var enumItems = new Enumerator(objWMISrvc.ExecQuery("Select * From Win32_OperatingSystem"));
+    var enumItems = new Enumerator(
+      objWMISrvc.ExecQuery("Select * From Win32_OperatingSystem"));
     var sys = enumItems.item();
-    this.WinVersion = sys.Version;
+    this.winVersion = sys.Version;
+*/
+    this.WinVersion = this.WindowsInfo.FullVersionNumber + "." +
+      this.WindowsInfo.FullBuildNumber;
   },
   SetupHttpReq: function() {
     // ref. XMLHttpRequest を作成する (mixi 日記アーカイブ)
@@ -284,10 +341,11 @@ var DispDonguriInfo = {
     strm.Type = 1; // adTypeBinary
     strm.Open();
     strm.Write(this.httpReq.ResponseBody);
-    strm.SaveToFile(this.BbsMenuJsonFile, 2); // over write
+    //strm.SaveToFile(this.BbsMenuJsonFile, 2); // over write
+    strm.Position = 0; // Reset writing position
     strm.Type = 2; // adTypeText
     strm.Charset = "utf-8"; // UTF-8 BOM
-    strm.LoadFromFile(this.BbsMenuJsonFile);
+    //strm.LoadFromFile(this.BbsMenuJsonFile);
     this.BbsMenuJson = strm.ReadText();
     strm.Position = 0; // Reset writing position
     strm.WriteText(this.BbsMenuJson);
@@ -890,7 +948,7 @@ local board folder.
   getStrWidth: function (str) {
     var width = 0;
     for (var i = 0; i  < str.length; i++) {
-      if (str.charAt(i) < 0x7f)
+      if (str.charCodeAt(i) < 0x7f)
         width++;
       else
         width += 1.85; // 61/33 = 1.848484...
@@ -985,11 +1043,3 @@ if (args.length < 2) { // Arguments check
 DispDonguriInfo.BoardUrl = args(0);
 DispDonguriInfo.DatPath = args(1);
 DispDonguriInfo.Disp();
-
-/*=============================================================================
-******** Is the "for - of" statement NOT implemented in JScript? Why? *********
--------------------------------------------------------------------------------
- The "for - of" statement was added in June 2015, ES6(ES2015), ECMA-262.
- JScript is based on ECMA-262 5.1 to 9 (ES2018) edition at least
-on the Windows 10 or later.
-=============================================================================*/
