@@ -1,4 +1,4 @@
-// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.7.2
+// SETTING.TXTとスレの >>1 からどんぐり設定情報を取得、表示 ver.0.7.4
 //
 //  Usage: getdonguri.js 5chの板のURL ローカル保存されているDATのパス
 //
@@ -11,11 +11,11 @@
 //  参考文献
 //
 //   SETTING.TXT - ５ちゃんねるwiki
-//   https://info.5ch.net/index.php/SETTING.TXT
+//   https://info.5ch.io/index.php/SETTING.TXT
 //   BBS_SLIP - ５ちゃんねるwiki
-//   https://info.5ch.net/index.php/BBS_SLIP
+//   https://info.5ch.io/index.php/BBS_SLIP
 //   新生VIPQ2 - ５ちゃんねるwiki
-//   https://info.5ch.net/index.php/%E6%96%B0%E7%94%9FVIPQ2#!extend:
+//   https://info.5ch.io/index.php/%E6%96%B0%E7%94%9FVIPQ2#!extend:
 //
 //   コマンド - 5chどんぐり非公式まとめwiki
 //   https://donguri.wikiru.jp/?command
@@ -26,12 +26,14 @@
 //   http://www2.wbs.ne.jp/~kanegon/doc/code.txt
 //
 //  1st res top 
-//   <>( sssp://img.5ch.net/ico/IMAGE.FILE(BE icon) <br>) !extend:(ID):(SLIP):(Max res. num.):(Max dat size KB):(donguri=x/y)(:) <br>
+//   <>( sssp://img.5ch.io/ico/IMAGE.FILE(BE icon) <br>) !extend:(ID):(SLIP):(Max res. num.):(Max dat size KB):(donguri=x/y)(:) <br>
 //  1st res bottom
 //   <hr>VIPQ2_EXTDAT: ID:SLIP:Max res. num.:Max dat size KB:donguri=x/y: EXT was configured <>
 //
 
 // 修正履歴
+//  ver.0.7.4: Changed 5ch TLD name, '.net' to '.io'.
+//  ver.0.7.3: Added information on Windows architecture 64/32-bit.
 //  ver.0.7.2: Changed the method of getting Windows information.
 //           : Added UBR to Windows version number string.
 //  ver.0.7.1: Corrected charAt() to charCodeAt() in the getStrWidth().
@@ -51,7 +53,7 @@
 //                : And test code...
 //  ver.0.6.6pre.1: Added information if according to SETTING.TXT is modified,
 //                : visit a new board or bbsmenu.json cache is expired
-//  ver.0.6.5: Added getting & processing a https://menu.5ch.net/bbsmenu.json
+//  ver.0.6.5: Added getting & processing a https://menu.5ch.io/bbsmenu.json
 //  ver.0.6.5pre.2: test code...
 //  ver.0.6.5pre.1: Rewritten HTTP setup and process code
 //  ver.0.6.4: Corrected regex begin/last part of !extend: command, [SPC] -> \s+.
@@ -90,7 +92,7 @@
 
 var DispDonguriInfo = {
   // version number of getdonguri.js
-  Version: "0.7.2",
+  Version: "0.7.4",
 
   // Script configurations
   // bbsmenu.json cache expiration [sec]
@@ -144,8 +146,9 @@ var DispDonguriInfo = {
   //      https://www2.say-tech.co.jp/special/ryo-yamaichi/tec-001
   getWindowsInfo: function() {
     var regVersionInfo = {
-      regKeyRoot: "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\",
-      regKeyTbl: [
+      regKeyRoot: ["HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\",
+      "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\Environment\\"],
+      regKeyTbl: [[
       "CurrentBuild",              // Actual system build number
       "CurrentBuildNumber",        // Compatibility mode build number
       "CurrentMajorVersionNumber", // Windows major version number
@@ -156,13 +159,16 @@ var DispDonguriInfo = {
       "ProductName",               // Windows xx Pro/Home
       "ReleaseId",                 // 200x
       "UBR"                        // Update Build Revision
-      ]
+      ],
+      ["PROCESSOR_ARCHITECTURE"]]  // AMD64/x86, Windows architecture 64 or 32-bit
     };
     var regKey = "";
     this.WindowsInfo = {};
-    for (var i = 0; i < regVersionInfo.regKeyTbl.length; i++) {
-      regKey = regVersionInfo.regKeyRoot + regVersionInfo.regKeyTbl[i];
-      this.WindowsInfo[regVersionInfo.regKeyTbl[i]] = this.Shell.RegRead(regKey);
+    for (var i = 0; i < regVersionInfo.regKeyRoot.length; i++) {
+      for (var j = 0; j < regVersionInfo.regKeyTbl[i].length; j++) {
+        regKey = regVersionInfo.regKeyRoot[i] + regVersionInfo.regKeyTbl[i][j];
+        this.WindowsInfo[regVersionInfo.regKeyTbl[i][j]] = this.Shell.RegRead(regKey);
+      }
     }
     // ProductFullName
     this.WindowsInfo.ProductFullName = this.WindowsInfo.ProductName;
@@ -170,6 +176,11 @@ var DispDonguriInfo = {
       this.WindowsInfo.ProductFullName += " " + this.WindowsInfo.DisplayVersion;
     else
       this.WindowsInfo.ProductFullName += " " + this.WindowsInfo.ReleaseId;
+    // 64 or 32-bit
+    if (this.WindowsInfo.PROCESSOR_ARCHITECTURE == "AMD64")
+      this.WindowsInfo.ProductFullName += " " + "64-bit";
+    else
+      this.WindowsInfo.ProductFullName += " " + "32-bit";
     // FullVersionNumber
     if (this.WindowsInfo.CurrentMajorVersionNumber)
       this.WindowsInfo.FullVersionNumber =
@@ -246,15 +257,16 @@ var DispDonguriInfo = {
     }
   },
   ParseBoardUrl: function() {
+    this.BoardUrl.replace(/\.5ch\.net/, ".5ch.io");
     var Urls =
-    this.BoardUrl.match(/https:\/\/(([-A-Za-z0-9]+)\.5ch\.net)\/([-A-Za-z0-9]+)\//);
+    this.BoardUrl.match(/https:\/\/(([-A-Za-z0-9]+)\.5ch\.io)\/([-A-Za-z0-9]+)\//);
     if (Urls) {
       this.ServerFullName = Urls[1]
       this.ServerName = Urls[2];
       this.BoardName = Urls[3];
       this.SettingTxtUrl = this.BoardUrl + "SETTING.TXT";
-      this.BbsMenuJsonUrl = "https://menu.5ch.net/bbsmenu.json";
-      //this.BbsMenuHtmlUrl = "https://menu.5ch.net/bbsmenu.html";
+      this.BbsMenuJsonUrl = "https://menu.5ch.io/bbsmenu.json";
+      //this.BbsMenuHtmlUrl = "https://menu.5ch.io/bbsmenu.html";
     } else {
       this.ErrMsg = "5ちゃんねるの掲示板ではありません";
       this.DispErr();
@@ -598,7 +610,7 @@ local board folder.
     var dat = fs.OpenTextFile(this.DatPath, 1, 0);
     var dat1st = dat.ReadLine();
     dat.Close();
-    var dngrtop = dat1st.match(/<>( sssp:\/\/img\.5ch\.net\/ico\/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?\s+!extend:(.*?):(.*?):(\d+)?:(\d+)?(:donguri=(\d+)\/(\d))?:{0,2}\s+<br>/);
+    var dngrtop = dat1st.match(/<>( sssp:\/\/img\.5ch\.io\/ico\/[-\w!#\$%&'\(\)\*\+,\.:;=?]+? <br>)?\s+!extend:(.*?):(.*?):(\d+)?:(\d+)?(:donguri=(\d+)\/(\d))?:{0,2}\s+<br>/);
     var dngrbtm = dat1st.match(/<hr>VIPQ2_EXTDAT: (.+?):(.+?):(\d+):(\d+):(donguri=(\d+)\/(\d))?: EXT was configured <>/);
     // Checking for "VIPQ2_EXTDAT:"
     if (dngrbtm) {
@@ -793,7 +805,7 @@ local board folder.
               } else {
                 this.dInfoTxt += " " + items[j].ItemDescTbl[0] + "\n";
                 // Added the description of the new feature from
-                // http://kes.5ch.net/test/read.cgi/donguri/1734767867/181
+                // http://kes.5ch.io/test/read.cgi/donguri/1734767867/181
                 if (!this._parent.isMngmntBorad(this._parent.BoardUrl)) {
                   var vipq2key = 2;
                   for (var k = 0; k < vipq2key; k++)
